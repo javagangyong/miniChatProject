@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xsi:schemaLocation="http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+		<property name="driverClassName"
+			value="oracle.jdbc.OracleDriver" />
+		<property name="jdbcUrl"
+			value="jdbc:oracle:thin:@192.168.1.100:1521:xe" />
+		<property name="username" value="c##minichat" />
+		<property name="password" value="1234" />
+	</bean>
+
+	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource">
+		<constructor-arg ref="hikariConfig" />
+	</bean>
+
+	<bean id="sqlSessionFactory"
+		class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+<!-- 		<property name="configLocation" value="classpath:mybatis/config.xml" /> -->
+		<property name="mapperLocations">
+		    <list>
+		        <value>classpath:mybatis/chat-mapper.xml</value>
+		    </list>
+		</property>
+	</bean>
+
+	<bean id="sqlSessionTemplate"
+		class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory" />
+	</bean>
+
+<!-- 	<bean id="mailSender" -->
+<!-- 		class="org.springframework.mail.javamail.JavaMailSenderImpl"> -->
+<!-- 		<property name="host" value="smtp.naver.com" /> -->
+<!-- 		<property name="port" value="465" /> -->
+<!-- 		<property name="username" value="dkdldy2@naver.com" /> -->
+<!-- 		<property name="password" value="Chamomile31424!" /> -->
+<!-- 		<property name="javaMailProperties"> -->
+<!-- 			<props> -->
+<!-- 				<prop key="mail.smtp.auth">true</prop> -->
+<!-- 				<prop key="mail.smtp.starttls.enable">true</prop> -->
+<!-- 				<prop key="mail.smtp.ssl.enable">true</prop> SSL 활성화 -->
+<!-- 			</props> -->
+<!-- 		</property> -->
+<!-- 	</bean> -->
+
+	<context:component-scan
+		base-package="com.itbank.service" />
+	<context:component-scan
+		base-package="com.itbank.component" />
+	<context:component-scan
+		base-package="com.itbank.exception" />
+
+	<mybatis-spring:scan
+		base-package="com.itbank.repository" />
+	<!-- 지정한 패키지에서 인터페이스 형태의 DAO를 스캔한다 -->
+
+</beans>

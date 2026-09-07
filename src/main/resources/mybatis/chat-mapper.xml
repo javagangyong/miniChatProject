@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+	"-//mybatis.org//DTD Mapper 3.0//EN"
+	"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.itbank.repository.ChatDAO">
+
+	<insert id="createChatroom">
+<!-- 	매개변수 ChatRoomDTO의 roomNo에 값을 setting. ChatRoomJoin을 위함. -->
+<!-- BEFORE = 명령문 실행전에 실행 // keyProperty = ~이라는 변수를 찾아가서 저장한다 -->
+		<selectKey keyProperty="roomNo" resultType="int" order="BEFORE">
+			select seqRoomNo.nextval from dual
+		</selectKey>
+	
+		insert into chatroom(roomNo, roomTitle, maxUserCount, roomType)
+			values(#{roomNo}, #{roomTitle}, #{maxUserCount}, #{roomType})
+	</insert>
+	
+	<insert id="insertChatRoomJoin">
+		insert into chatroomJoin(roomNo, userid, isWatching, lastReadMsgNo)
+			values(#{roomNo}, #{userid}, #{isWatching}, #{lastReadMsgNo})
+	</insert>
+	
+	<select id="selectChatroom" resultType="com.itbank.model.ChatRoomDTO">
+		select * from chatRoom order by roomNO desc
+	</select>
+
+</mapper>
