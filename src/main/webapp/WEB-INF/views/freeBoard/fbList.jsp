@@ -107,4 +107,3 @@
 
 
 
-<%@ include file="../footer.jsp" %>

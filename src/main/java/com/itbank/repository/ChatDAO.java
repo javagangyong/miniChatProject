@@ -1,17 +1,18 @@
 package com.itbank.repository;
 
+
 import java.util.List;
 
-import com.itbank.model.ChatDTO;
-import com.itbank.model.MatchDTO;
-import com.itbank.model.MessageDTO;
+import com.itbank.model.ChatRoomDTO;
+import com.itbank.model.ChatRoomJoinDTO;
 
 public interface ChatDAO {
 
-	int record(MessageDTO message);
+	int createChatroom(ChatRoomDTO dto);
 
-	List<ChatDTO> selectChats(MatchDTO dto);
+	int insertChatRoomJoin(ChatRoomJoinDTO joinDto);
 
-	int deleteChats(MatchDTO dto);
+	List<ChatRoomDTO> selectChatroom();
+
 
 }

@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 
 import com.itbank.component.HashComponent;
 import com.itbank.model.MemberDTO;
-import com.itbank.model.ProfileDTO;
 import com.itbank.repository.TestMemberDAO;
 
 @Service
@@ -14,9 +13,6 @@ public class TestMemberService {
 	@Autowired TestMemberDAO dao;
 	@Autowired HashComponent hash;
 
-	public ProfileDTO getMyProfile(String userid) {
-		return dao.selectProfile(userid);
-	}
 
 	public int updateInfo(MemberDTO dto) {
 		return dao.updateInfo(dto);

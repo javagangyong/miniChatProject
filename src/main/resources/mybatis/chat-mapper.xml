@@ -2,29 +2,27 @@
 <!DOCTYPE mapper PUBLIC
 	"-//mybatis.org//DTD Mapper 3.0//EN"
 	"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-	
+
 <mapper namespace="com.itbank.repository.ChatDAO">
-	<insert id="record" parameterType="msg">
-		insert into	chatting(sendUser, receiveUser, text)
-			values(#{userid}, #{to}, #{text})
+
+	<insert id="createChatroom">
+<!-- 	매개변수 ChatRoomDTO의 roomNo에 값을 setting. ChatRoomJoin을 위함. -->
+<!-- BEFORE = 명령문 실행전에 실행 // keyProperty = ~이라는 변수를 찾아가서 저장한다 -->
+		<selectKey keyProperty="roomNo" resultType="int" order="BEFORE">
+			select seqRoomNo.nextval from dual
+		</selectKey>
+	
+		insert into chatroom(roomNo, roomTitle, maxUserCount, roomType)
+			values(#{roomNo}, #{roomTitle}, #{maxUserCount}, #{roomType})
 	</insert>
 	
-	<select id="selectChats" parameterType="match">
-		SELECT c.idx, (select username from member where c.senduser = member.userid) as sendUser, 
-		(select username from member where c.receiveuser = member.userid) as receiveUser,
-		c.sendUser as sendUserID,
-		c.receiveUser as receiveUserID,
-		c.text, TO_CHAR(c.sendtime, 'yyyy/MM/dd-AM hh:mi') AS sendTime, d.profile 
-		FROM chatting c
-		JOIN condition d ON c.sendUser = d.userid
-		WHERE (c.sendUser = #{reqUser} AND c.receiveUser = #{respUser})
-		OR (c.sendUser = #{respUser} AND c.receiveUser = #{reqUser})
-		order by c.sendtime
-	</select>
+	<insert id="insertChatRoomJoin">
+		insert into chatroomJoin(roomNo, userid, isWatching, lastReadMsgNo)
+			values(#{roomNo}, #{userid}, #{isWatching}, #{lastReadMsgNo})
+	</insert>
 	
-	<delete id="deleteChats" parameterType="msg">
-		delete from chatting
-			where (sendUser = #{reqUser} and receiveUser = #{respUser})
-			or (sendUser = #{respUser} and receiveUser = #{reqUser}) 
-	</delete>
+	<select id="selectChatroom" resultType="com.itbank.model.ChatRoomDTO">
+		select * from chatRoom order by roomNO desc
+	</select>
+
 </mapper>

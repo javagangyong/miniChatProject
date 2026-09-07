@@ -1,9 +1,5 @@
 package com.itbank.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,10 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.itbank.component.HashComponent;
-import com.itbank.component.MailComponent;
-import com.itbank.model.ConditionDTO;
+import com.itbank.component.TestMailComponent;
 import com.itbank.model.MemberDTO;
-import com.itbank.model.ProfileDTO;
 import com.itbank.repository.MemberDAO;
 
 @Service
@@ -25,13 +19,11 @@ public class MemberService {
 	@Autowired
 	private HashComponent hash;
 	@Autowired
-	private MailComponent mail;
+	private TestMailComponent mail;
 	
 	private String saveDirectory = "C:\\upload";
 
 	public int join(MemberDTO dto) {
-		String hashPass = hash.getHash(dto.getUserpw());
-		dto.setUserpw(hashPass);
 		return dao.join(dto);
 	}
 
@@ -40,8 +32,6 @@ public class MemberService {
 	}
 
 	public MemberDTO selectOne(MemberDTO dto) {
-		String hashPass = hash.getHash(dto.getUserpw());
-		dto.setUserpw(hashPass);
 		return dao.selectOne(dto);
 	}
 
@@ -61,28 +51,7 @@ public class MemberService {
 		return row != 0 ? newPassword : null;
 	}
 
-	public int insertCondition(ConditionDTO dto) {
-		String fileName = dto.getUpload().getOriginalFilename();
-		Date date = new Date();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss_");
-		String today = sdf.format(date);
 
-		fileName = today + fileName;
-
-		File f = new File(saveDirectory, fileName);
-
-		try {
-			dto.getUpload().transferTo(f);
-		} catch (IllegalStateException | IOException e) {
-			e.printStackTrace();
-		}
-		dto.setProfile(fileName);
-		return dao.insertCondition(dto);
-	}
-
-	public ConditionDTO selectCondition(String userid) {
-		return dao.selectCondition(userid);
-	}
 
 	public MemberDTO selectOneById(String userid) {
 		return dao.selectOneById(userid);
@@ -97,25 +66,6 @@ public class MemberService {
 		return row;
 	}
 
-	public int conditionModify(ConditionDTO dto) {
-		String fileName = dto.getUpload().getOriginalFilename();
-		Date date = new Date();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss_");
-		String today = sdf.format(date);
-
-		fileName = today + fileName;
-
-		File f = new File(saveDirectory, fileName);
-
-		try {
-			dto.getUpload().transferTo(f);
-		} catch (IllegalStateException | IOException e) {
-			e.printStackTrace();
-		}
-		dto.setProfile(fileName);
-		int row = dao.conditionUpdate(dto);
-		return row;
-	}
 
 	public int newPw(MemberDTO dto) {
 		String hashPass = hash.getHash(dto.getUserpw());
@@ -138,9 +88,6 @@ public class MemberService {
 		return dao.updateLastLogin(userid);
 	}
 
-	public ProfileDTO selectProfile(String userid) {
-		return dao.selectProfile(userid);
-	}
 
 	// 아이디 찾기
 	public String findID(MemberDTO dto) {
@@ -180,10 +127,6 @@ public class MemberService {
 		return newPassword.toString();
 	}
 
-	// 이메일로 임시 비밀번호 전송
-	public void sendTemporaryPasswordByEmail(String email, String newPassword) {
-		mail.sendPasswordResetEmail(email, newPassword);
-	}
 
 	public List<String> getProfiles(String gender) {
 		return dao.getProfiles(gender);

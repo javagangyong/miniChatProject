@@ -13,7 +13,7 @@
 			value="oracle.jdbc.OracleDriver" />
 		<property name="jdbcUrl"
 			value="jdbc:oracle:thin:@192.168.1.100:1521:xe" />
-		<property name="username" value="c##finalProject" />
+		<property name="username" value="c##minichat" />
 		<property name="password" value="1234" />
 	</bean>
 
@@ -24,11 +24,9 @@
 	<bean id="sqlSessionFactory"
 		class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
-		<property name="configLocation" value="classpath:mybatis/config.xml" />
+<!-- 		<property name="configLocation" value="classpath:mybatis/config.xml" /> -->
 		<property name="mapperLocations">
 		    <list>
-		        <value>classpath:mybatis/manager-mapper.xml</value>
-		        <value>classpath:mybatis/match-mapper.xml</value>
 		        <value>classpath:mybatis/chat-mapper.xml</value>
 		    </list>
 		</property>

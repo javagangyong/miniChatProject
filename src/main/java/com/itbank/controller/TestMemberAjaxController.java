@@ -7,7 +7,6 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.itbank.component.TestMailComponent;
 import com.itbank.model.MemberDTO;
-import com.itbank.model.ProfileDTO;
 import com.itbank.service.TestMemberService;
 
 @RestController
@@ -28,11 +26,6 @@ public class TestMemberAjaxController {
 	@Autowired TestMemberService tms;
 	@Autowired TestMailComponent tmc;
 	
-	@GetMapping("/myProfile/{userid}")
-	public ProfileDTO myProfile(@PathVariable String userid) {
-		ProfileDTO dto = tms.getMyProfile(userid);
-		return dto;
-	}
 	
 	@PostMapping("/infoModify")
 	public String infoModify(@RequestBody MemberDTO dto) {

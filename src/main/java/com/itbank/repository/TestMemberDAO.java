@@ -4,12 +4,9 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import com.itbank.model.MemberDTO;
-import com.itbank.model.ProfileDTO;
 
 public interface TestMemberDAO {
 
-	@Select("select * from memberInfo where userid = #{userid}")
-	ProfileDTO selectProfile(String userid);
 
 	@Update("update member set "
 			+ "username = #{username}, gender = #{gender}, birthYear = #{birthYear}, "

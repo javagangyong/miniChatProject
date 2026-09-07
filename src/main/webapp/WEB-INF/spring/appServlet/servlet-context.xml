@@ -64,17 +64,6 @@
          <beans:bean class="com.itbank.interceptor.LoginInterceptor" />
       </interceptor>
       <interceptor>
-         <mapping path="/manage/**"/>
-         <beans:bean class="com.itbank.interceptor.AdminInterceptor" />
-      </interceptor>
-      <interceptor>
-         <mapping path="/membership/myMembership/"/>
-         <mapping path="/match/**"/>
-         <mapping path="/testMatch/**"/>
-         <exclude-mapping path="/match/mymatch"/>
-         <beans:bean class="com.itbank.interceptor.MembershipInterceptor" />
-      </interceptor>
-      <interceptor>
          <mapping path="/"/>
          <beans:bean class="com.itbank.interceptor.HomeInterceptor" />
       </interceptor>

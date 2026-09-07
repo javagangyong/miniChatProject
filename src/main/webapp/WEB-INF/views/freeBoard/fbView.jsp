@@ -188,4 +188,3 @@
 
 
 
-<%@ include file="../footer.jsp" %>

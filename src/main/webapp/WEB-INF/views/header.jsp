@@ -6,1055 +6,137 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>duo</title>
+<title>miniChatProject</title>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script
 	src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.js"></script>
 <script
 	src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js"></script>
-<script src="${cpath }/resources/js/chatting.js"></script>
-<script src="${cpath }/resources/js/chatting_bottom.js"></script>
-<script src="${cpath }/resources/js/matching.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
 <style>
 @import
-	url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap')
-	;
+	url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
 
-* {
-	user-select: none;
-}
-
-html {
-	scroll-behavior: smooth;
-}
-
-body {
-	margin: 0;
-	font-family: 'Noto Sans KR', sans-serif;
-	overflow-x: hidden;
-	width: 100%;
-	height: 100%;
-}
-
-body, h1, h2, h3, h4, h5, h6, input, textarea, select, pre {
-	font-family: 'Noto Sans KR', sans-serif;
-}
-
-header {
-	position: fixed;
-	background-color: white;
-	color: black;
-	z-index: 5;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 95px;
-}
-
-header a {
-	text-decoration: none;
-	color: inherit;
-}
-
-button:hover {
-	cursor: pointer !important;
-}
-
-.header {
-	width: 100%;
-	display: flex;
-	justify-content: space-between;
-}
-
-#logo {
-	flex: 1;
-}
-
-#logo>a {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	height: 95px;
-}
-
-#logo>a>img {
-	max-height: 110px;
-}
-
-.frame {
-	width: 900px;
-	margin: 0 auto;
-	padding: 95px 0;
-}
-
-#menu {
-	flex: 4;
-	display: flex;
-	justify-content: space-around;
-	align-items: center;
-	padding: 0;
-	list-style: none;
-	color: inherit;
-	font-size: 22px;
-}
-
-#menu>li {
-	flex: 1;
-	text-align: center;
-}
-
-#loginUser {
-	flex: 1;
-}
-
-#ch_login_user {
-	width: 100%;
-	height: 100%;
-	position: relative;
-	display: flex;
-	justify-content: space-evenly;
-	align-items: center;
-}
-
-#ch_user_profile {
-	width: 60px;
-	height: 60px;
-	border-radius: 50%;
-	max-width: 100%;
-}
-
-#ch_user_alarm {
-	all: unset;
-	display: inline-block;
-	width: 60px;
-	height: 60px;
-	font-size: 36px;
-	text-align: center;
-	transition-duration: 0.5s;
-}
-
-#ch_user_alarm:hover {
-	cursor: pointer;
-	font-size: 40px;
-}
-
-.ch_user_news {
-	position: absolute;
-	box-shadow: 0px 0px 8px black;
-	border-radius: 10px;
-	top: 82%;
-	left: -70%;
-	background-color: white;
-	width: 250px;
-	height: 40px;
-	z-index: 10;
-	color: black;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-
-.ch_user_news::before {
-	content: '';
-	position: absolute;
-	right: 100%;
-	margin-top: -8px;
-	border: 1px solid black;
-	border-width: 10px;
-	border-style: solid;
-	border-color: transparent transparent transparent #ffffff;
-	transform: rotate(-79deg) translate(68px, 243px);
-}
-
-.link:hover {
-	cursor: pointer;
-	color: red;
-	font-weight: bold;
-}
-
-.drop {
-	display: flex;
-	position: absolute;
-	top: 95px;
-	left: 0;
-	width: 100%;
-	height: 0;
-	background-color: white;
-	overflow: hidden;
-	transition-duration: 0.5s;
-}
-
-.drop>div:nth-child(1), .drop>div:nth-child(3) {
-	flex: 1;
-}
-
-.drop>div:nth-child(2) {
-	flex: 4;
-	display: flex;
-	justify-content: space-around;
-}
-
-header:hover>.drop {
-	height: 150px;
-}
-
-header:hover {
-	color: black;
-	background-color: white;
-}
-
-.drop ul {
-	width: 100%;
-	padding: 0;
-	list-style: none;
-	color: grey;
-}
-
-.drop ul>li {
-	width: 100%;
-	text-align: center;
-	font-size: 18px;
-	font-weight: 200;
-	margin-top: 10px;
-	font-size: 17px;
-}
-
-.hidden {
-	display: none !important;
-}
-
-hr {
-	width: 100%;
-	position: fixed;
-	top: 95px;
-	display: none;
-	z-index: 5;
-}
-
-header:hover>hr {
-	display: block;
-}
-
-h1 {
-	font-size: 30px;
-}
-
-h1, h2 {
-	font-weight: 200;
-}
-
-/* 채팅 */
-.room { /* 특정 상대방과의 채팅방 */
-	padding: 0 !important;
-	display: flex;
-	position: fixed;
-	width: 22%;
-	height: 60%;
-	right: 0;
-	bottom: 0;
-	justify-content: center;
-	align-items: center;
-	flex-direction: column;
-	z-index: 5;
-}
-
-.room label {
-	border: 0 !important;
-	color: black !important;
-	height: auto !important;
-}
-
-.chat { /* 채팅방 메인화면 */
-	padding: 0 !important;
-	display: flex;
-	position: fixed;
-	width: 22%;
-	height: 60%;
-	right: 0;
-	bottom: 0;
-	justify-content: center;
-	align-items: center;
-	flex-direction: column;
-	z-index: 5;
-}
-
-.chat label {
-	border: 0 !important;
-	color: black !important;
-}
-
-.chat>div {
-	box-sizing: border-box;
-}
-
-#chatTitle {
-	background-color: #4B89DC;
-	width: 100%;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	border: 1px solid black;
-}
-
-.chat_main {
-	width: 100%;
-	height: 100%;
-	border: 1px solid black;
-	background-color: white;
-}
-
-#chat_close_btn {
-	font-size: 24px;
-	font-weight: bold;
-	color: lime;
-	position: absolute;
-	top: -1%;
-	right: 92%;
-	z-index: 5;
-	transform: translate(5px, 5px);
-}
-
-#chat_close_btn:hover {
-	cursor: pointer;
-}
-
-.chat_back_btn {
-	font-size: 24px;
-	font-weight: bold;
-	color: lime;
-	position: absolute;
-	top: -1%;
-	right: 92%;
-	z-index: 10;
-	transform: translate(5px, 5px);
-}
-
-.chat_back_btn:hover {
-	cursor: pointer;
-}
-
-#chat_open_btn {
-	position: fixed;
-	bottom: 20px;
-	right: 20px;
-	width: 70px;
-	height: 70px;
-	border-radius: 8px;
-	background-color: hotpink;
-	color: white;
-	font-size: 20px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	z-index: 10;
-}
-
-#chat_open_btn:hover {
-	cursor: pointer;
-}
-
-#chat_open_btn>span {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-}
-
-.chatroom {
-	width: 100%;
-	height: 50px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	font-size: 20px;
-	font-weight: 300;
-	margin: 5px;
-}
-
-.chatroom > div:nth-child(1) {
-	border-radius: 50%;
-}
-
-.chatroom > div:nth-child(2) {
-	width: 80%;
-	font-size: 15px;
-}
-
-.chatroom  p {
-	margin: 0;
-	margin-left: 5px;
-	padding: 2px;
-	width: fit-content;
-	white-space: nowrap; 
-    overflow: hidden; 
-    text-overflow: ellipsis; 
-}
-
-.ch_msg_date {
-	font-size: 13px;
-	background-color: skyblue;
-    width: fit-content;
-    margin: 5px auto;
-    border-radius: 10px;
-    padding: 3px 25px;
-}
-
-#ch_room_profile {
-	width: 50px;
-	height: 50px;
-	background-size: cover;
-	background-position: center;
-	background-repeat: no-repeat;
-}
-
-.chatroom:hover {
-	cursor: pointer;
-	background-color: skyblue;
-}
-
-#chat_heart {
-	font-size: 50px;
-	transform: translate(-50%, -55%) !important;
-}
-
-.messageArea {
-	width: 100%;
-	height: 100%;
-	border: 1px solid black;
-	background-color: #aeceef;
-	overflow-y: scroll;
-}
-
-.messageArea::-webkit-scrollbar {
-	display: none;
-}
-
-.chatting {
-	width: 100%;
-	height: 80px;
-	background-color: white;
-	display: flex;
-	justify-content: space-between;
-}
-
-.chatMsg {
-	all: unset;
-	border: 1px solid black;
-	flex: 3;
-	height: 100%;
-	resize: none;
-	box-sizing: border-box;
-	padding: 5px;
-	flex: 3;
-}
-
-.sendMsg {
-	all: unset;
-	flex: 1;
-	height: 100%;
-	background-color: yellow;
-	font-weight: bold;
-	text-align: center;
-	border: 2px solid black;
-	box-sizing: border-box;
-}
-
-.leftMsg {
-	margin-top: 10px;
-	margin-left: 10px;
-	display: flex;
-	align-items: flex-start;
-	flex-direction: column;
-}
-
-.rightMsg {
-	margin-top: 20px;
-	margin-right: 5px;
-	display: flex;
-	align-items: flex-end;
-	flex-direction: column;
-}
-
-.leftMsg>div {
-	position: relative;
-	width: fit-content;
-	min-width: 30px;
-	max-width: 150px;
-	max-height: 300px;
-	border-radius: 10px;
-	background-color: white;
-	box-sizing: border-box;
-	padding: 5px;
-	margin-left: 35px;
-	margin-bottom: 10px;
-	transform: translate(10px, -14px);
-}
-
-.rightMsg>div {
-	position: relative;
-	width: fit-content;
-	min-width: 30px;
-	max-width: 150px;
-	max-height: 300px;
-	border-radius: 5px;
-	background-color: yellow;
-	box-sizing: border-box;
-	padding: 5px;
-	margin-right: 10px;
-	margin-bottom: 10px;
-}
-
-.leftMsg>div::before {
-	content: '';
-	position: absolute;
-	right: 100%;
-	margin-top: -8px;
-	border-width: 10px;
-	border-style: solid;
-	border-color: transparent transparent transparent #ffffff;
-	transform: rotate(105deg) translate(0, -11px);
-}
-
-.rightMsg>div::before {
-	content: '';
-	position: absolute;
-	left: 100%;
-	margin-top: -15px;
-	border-width: 10px;
-	border-style: solid;
-	border-color: transparent #ffff00 transparent transparent;
-	transform: rotate(20deg) translate(-18px, 8px);
-}
-
-.leftMsg sub {
-	font-size: 12px;
-	position: absolute;
-	top: 100%;
-	left: 100%;
-	width: 70px;
-	transform: translate(6px, -16px);
-}
-
-.rightMsg sub {
-	font-size: 12px;
-	position: absolute;
-	width: 70px;
-	top: 100%;
-	right: 100%;
-	transform: translate(2px, -16px);
-}
-
-#oponent {
-	display: flex;
-}
-
-#oponent_profile {
-	display: inline-block;
-	width: 35px;
-	height: 35px;
-	border-radius: 5px;
-	background-position: center;
-	background-size: 100%;
-	margin-right: 10px;
-}
-
-.chatOpt {
-	position: absolute;
-	top: 0;
-	left: 0;
-}
-
-.matchingEnd {
-	position: absolute;
-	display: flex;
-	width: 250px;
-	height: 100px;
-	flex-direction: column;
-	justify-content: center;
-	background-color: rgba(0, 0, 255, 0.5);
-	align-items: center;
-	border-radius: 20px;
-	z-index: 10;
-}
-
-.matchingEnd button {
-	all: unset;
-	cursor: pointer;
-	color: white;
-	font-weight: bold;
-	text-align: center;
-}
-
-.matchingEndBtn {
-	all: unset;
-	position: absolute;
-	top: 1%;
-	right: 2%;
-	font-size: 13px;
-	display: inline-block;
-	width: 70px;
-	height: 20px;
-	border: 2px solid hotpink;
-	color: hotpink;
-	text-align: center;
-	background-color: white;
-}
-
-.matchingEndBtn {
-	cursor: pointer;
-}
-
-.disconnect {
-	position: absolute;
-	background-color: rgba(0, 0, 0, 0.6);
-	display: flex;
-	width: 100%;
-	height: 100%;
-	justify-content: center;
-	align-items: center;
-	color: white;
-	font-size: 17px;
-	font-weight: bold;
-	z-index: 20;
-}
-
-.disconnectMsg {
-	text-align: center;
-}
-
-.disconnectMsg>a {
-	all: unset;
-	margin-top: 10px;
-}
-
-.disconnectMsg>a:hover {
-	cursor: pointer;
-	color: lightgrey;
-}
-
-.talkAlarm {
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	border-radius: 10px;
-	transform: translate(-50%, -50%);
-	background-color: rgba(0, 0, 0, 0.7);
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	width: 300px;
-	flex-direction: column;
-	height: 200px;
-	z-index: -5;
-	opacity: 0;
-	transition-duration: 1s;
-}
-
-#ch_alarm {
-	width: 100%;
-	height: 70%;
-	font-size: 16px;
-	color: white;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-
-#ch_alarm_btns {
-	display: flex;
-	width: 100%;
-	height: 30%;
-}
-
-#ch_alarm_btns>button {
-	all: unset;
-	width: 100%;
-	color: white;
-	font-size: 16px;
-	font-weight: bold;
-	text-align: center;
-}
-
-#ch_alarm_btns>button:hover {
-	cursor: pointer;
-	color: lightgrey;
-}
-
-#ch_alarm_profile {
-	width: 50px;
-	height: 50px;
-	border-radius: 10px;
-	background-position: center;
-	background-size: 100%;
-	background-repeat: no-repeat;
-}
-
-#ch_alarm_text {
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	width: 200px;
-	transform: translate(30px);
-}
-
-#ch_matching_end {
-	width: 300px;
-	text-align: center;
-	color: white;
-	font-weight: bold;
-}
-
-/* 매칭 신청 받을시 */
-.tryMatchSb {
-	display: flex;
-	justify-content: space-around;
-	width: 300px;
-	margin: 0 auto;
-}
-
-.tryMatchSb>div {
-	cursor: pointer;
-	font-size: 17px;
-}
-
-#reqUseroverlay {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 1;
-}
-
-.reqUserSb {
-	display: flex;
-	justify-content: space-between;
-}
-
-.userRequest {
-	font-weight: bold;
-}
-
-/* 매칭 신청 받을시 프로필, 버튼*/
-#ch_oponent_profile {
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	box-shadow: 1px 1px 15px ${login.gender== '남성'? 'hotpink': 'skyblue'};
-	border-radius: 15px;
-	width: 35%;
-	height: 0px;
-	z-index: 6;
-	transition-duration: 1.2s;
-	overflow-y: hidden;
-}
- 
-#ch_oponent_profile>div {
-	width: 100%;
-	height: 50%;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-}
-
-#ch_oponent_profile>div:nth-child(2) {
-	justify-content: flex-start;
-	align-items: flex-start;
-}
-
-#ch_profile_overlay {
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	border-radius: 15px;
-	width: 35%;
-	height: 0px;
-	background-color: white;
-	z-index: 5;
-	transition-duration: 1s;
-}
-
-.ch_height_toggle {
-	height: 96% !important;
-}
-
-#ch_oponent_img>div {
-	width: 350px;
-	height: 350px;
-	border-radius: 50%;
-	box-shadow: 1px 1px 15px grey inset;
-	background-size: cover;
-	background-repeat: no-repeat;
-	background-position: center;
-}
-
-#ch_oponent_detail {
-	width: 100%;
-}
-
-#ch_oponent_detail>p {
-	margin: 2px auto;
-	width: fit-content;
-	font-size: 17px;
-	font-weight: bold;
-	color: white;
-}
-
-#ch_oponent_detail>pre {
-	margin: 5px auto;
-	color: white;
-	font-size: 15px;
-	font-weight: bold;
-	width: 300px;
-	height: 120px;
-	white-space: pre-wrap;
-	word-wrap: break-word;
-	box-sizing: border-box;
-	border-radius: 15px;
-	box-shadow: 1px 1px 40px ${login.gender== '남성'? 'hotpink': 'skyblue'} inset;
-	padding: 10px;
-}
-.ch_bg_women {
-	background-color: rgba(242, 140, 191, 0.4);
-}
-
-.ch_bg_men {
-	background-color: rgb(135, 206, 235, 0.4);
-}
-
-#ch_top_arrow {
-	position: fixed;
-	bottom: 100px;
-	right: 30px;
-	width: 50px;
-	height: 50px;
-	background-image: url('${cpath}/resources/image/하트화살표.jpg');
-	background-size: cover;
-	background-position: center;
-	background-color: white;
-	border-radius: 50%;
-	box-shadow: 1px 5px 8px grey;
-	z-index: -10;
-	opacity: 0;
-	cursor: pointer;
-	transition-duration: 1s;
-}
-
-
-
-
-
-
-
-
-
-
-	/* 테스트 매칭 스타일*/
-	#userInfo {
-		position: fixed;
-		left: 50%;
-		top: 50%;
-		transform: translate(-50%, -47%);
-		width: 400px;
-		height: 700px;
-		background-color: #fafafa;
-		border: 1px solid #e9ecef;
-		z-index: 7;
-		display: none;
-		overflow: hidden;
+	* {
+		user-select: none;
 	}
-	#userProfile {
-		width: 280px;
-		height: 300px;
-		margin: 30px auto;
-		background-size: cover;
-		background-position: center;
-		background-repeat: no-repeat;
+	
+	html {
+		scroll-behavior: smooth;
 	}
-	#userCon {
-		width: 280px;
-		height: 315px;
-		margin: 0 auto;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-content: center;
-	}
-	.heightToggle {
-		display: block !important;
-	}
-	#overlay {
-		position: fixed;
-		top: 0;
-		left: 0;
+	
+	body {
+		margin: 0;
+		font-family: 'Noto Sans KR', sans-serif;
+		overflow-x: auto;
 		width: 100%;
 		height: 100%;
-		z-index: 6;
-		background-color: rgba(0, 0, 0, 0.3);
 	}
-	#userCon > p {
-		margin-top: 3px;
-		margin-bottom: 3px;
+	
+	body, h1, h2, h3, h4, h5, h6, input, textarea, select, pre {
+		font-family: 'Noto Sans KR', sans-serif;
 	}
-	#userCon > pre {
-		white-space: pre-wrap;
+	
+	
+	button:hover {
+		cursor: pointer !important;
 	}
-	.userConBtn {
-		width: 140px;
+	
+	nav {
+		color: #ffffff;
+	}
+	
+	ul, li, a {
+		text-decoration: none;
+		color: inherit;
+	}
+	
+	nav.navBar {		
+		background-color: #0d6efd;
+		width: 100%;
+		min-width: 1160px;
+		padding: 15px 0;
+	}
+	
+	.nav_inner_width {
+		width: 1160px;
+		margin: 0 auto;
 		display: flex;
 		justify-content: space-between;
-		align-items: center;
-		margin: 0 auto;
+		list-style: none;
+		align-items: center;		
 	}
-	#testConsent:hover, 
-	#testRefuse:hover, 
-	#testDefer:hover {
-		cursor: pointer;
-		transform: translateY(-3px);
-		transition: transform 0.2s ease;
+	
+	div.nav_spacer {
+		min-width: 550px;
 	}
+	
+	.nav_inner_width > div {
+		white-space: nowrap; /* 텍스트가 밑으로 줄바꿈 되지 않게 */
+	}
+	
+	.fa-solid {
+		margin-right: 4px;
+	}
+	
+	.fa-circle {
+		color: #198754;
+		font-size: 0.75rem;
+		margin-right: 6px;
+	}
+
+	button {
+	  /* 1. 브라우저 기본 스타일 제거 */
+	  background: none;
+	  border: none;
+	  padding: 0;
+	  margin: 0;
+	  
+	  /* 2. 폰트 및 텍스트 설정 (부모 요소의 폰트 상속) */
+	  font-family: inherit;
+	  font-size: inherit;
+	  color: inherit;
+	  line-height: inherit;
+	  
+	  /* 3. 클릭 및 상호작용 관련 설정 */
+	  cursor: pointer;
+	  outline: none; /* Focus outline 필요 시 별도 지정 */
+	}
+	
+	.hidden {
+		display: none !important;
+	}
+	
 </style>
-</head>
+
 <body>
-	<div id="ch_top_arrow" onclick="toTopHandler()">
 	
-	</div>
-	
-	<header>
-		<div class="header">
-			<div id="logo">
-				<a href="${cpath }"><img
-               src="${cpath }/resources/image/듀세요로고.png"></a>
-			</div>
-			<ul id="menu">
-				<li category="match">매칭시스템</li>
-				<li category="guide">가입안내</li>
-				<li>고객문의</li>
-				<li category="marrige">회원&성혼</li>
-				<!-- 				<li>러브테스트</li> -->
-				<li category="membership">멤버십</li>
-			</ul>
-			<div id="loginUser">
-				<div class="${empty login ? 'hidden' : ''}" id="ch_login_user">
-					<button id="ch_user_alarm" onclick="newsAppearHandler()">🔔</button>
-					<div class="ch_user_news hidden"></div>
-					<h2 style="color: inherit; font-size: 20px;">${login.username }님</h2>
-					<img id="ch_user_profile">
-				</div>
-			</div>
-		</div>
-		<hr style="border: 0; height: 1px; background-color: lightgrey;">
-		<div class="drop">
-			<div></div>
+	<nav class="navBar">
+		<div class="nav_inner_width">
+			<div><a href="${cpath }">
+				<i class="fa-solid fa-comments"></i> miniChat
+			</a></div>
+			<div class="nav_spacer"></div>
 			<div>
-				<ul>
-					<li class="link" id="match_mainLink" category="match"><a
-						href="${cpath}/match/match_main">매칭 홈</a></li>
-					<li class="link"><a href="${cpath }/match/mymatch">매칭 현황</a></li>
-					<!-- 					<li>테스트</li> -->
-					<!-- 					<li>테스트</li> -->
-					<!-- 					<li>테스트</li> -->
-					<!-- 					<li>테스트</li> -->
-				</ul>
-				<ul>
-					<li class="link" id="logLink"
-						value="${empty login ? 'login' : 'logout' }" category="guide">
-						<a href="${cpath }/member/${empty login ? 'login' : 'logout'}">${empty login ? '로그인' : '로그아웃' }</a>
-
-					</li>
-					<li class="link ${!empty login ? 'hidden' : '' }" id="joinLink"
-						category="guide"><a href="${cpath }/member/join">회원가입</a></li>
-					<li class="link" id="mypageLink" category="guide"><a
-						href="${cpath }/member/mypage">마이페이지</a></li>
-					<!-- 					<li>테스트</li> -->
-					<!-- 					<li>테스트</li> -->
-					<!-- 					<li>테스트</li> -->
-				</ul>
-				<ul>
-					<li class="link" id="reportLink" category="inquiry"><a
-						href="${cpath }/report/myreport">회원신고</a></li>
-					<li class="link"><a href="${cpath }/testMember/testJoin">테스트 메일보내기</a></li>
-					<!-- 					<li>테스트</li> -->
-					<!-- 					<li>테스트</li> -->
-					<!-- 					<li>테스트</li> -->
-					<!-- 					<li>테스트</li> -->
-				</ul>
-				<ul>
-					<li class="link" id="marrigeReviewLink" category="marrige"><a
-						href="${cpath }/review/list/1">성혼커플 인터뷰</a></li>
-					<li class="link" id="freeBoardLink"><a 
-						href="${cpath }/freeBoard/fbList/1">자유게시판</a></li>
-					<li class="link">
-						<a href="${cpath }/testMatch/testMatch_main">테스트 매칭</a></li>
-					<li class="link"><a href="${cpath }/testMember/testMypage">테스트 마이페이지</a></li>
-					<!-- 					<li>테스트</li> -->
-					<!-- 					<li>테스트</li> -->
-				</ul>
-				<ul>
-					<li class="link" id="membershipLink" category="membership"><a
-						href="${cpath }/membership/purchase">멤버십</a></li>
-					<li class="link" id="membershipIntroduceLink" category="membership">
-						<a href="${cpath }/membership/introduce">멤버십 소개</a>
-					</li>
-					<li class="link" id="myMembershipLink" category="membership">
-						<a href="${cpath }/membership/myMembership/">마이멤버십</a>
-					</li>
-					<!-- 					<li>테스트</li> -->
-					<!-- 					<li>테스트</li> -->
-					<!-- 					<li>테스트</li> -->
-				</ul>
+				<c:if test="${not empty login }">
+					<i class="fa-solid fa-circle"></i>${login.nickname }님
+				</c:if>
 			</div>
-			<div></div>
 		</div>
-	</header>
-
-	<section class="chat hidden">
-		<div class="hidden" id="chat_close_btn" onclick="chatAppearHandler()">➖</div>
-
-		<div id="chatTitle">
-			<h2 style="text-align: center; color: white; margin: 0;">CHAT</h2>
-
-		</div>
-
-		<div class="chat_main"></div>
-	</section>
+	</nav>
 
 
 
 
-	<div class="${empty login ? 'hidden' : '' }" id="chat_open_btn"
-		onclick="chatAppearHandler()">
-		<span id="chat_heart">💗</span> 
-		<span>CHAT</span>
-	</div>
+</body>
 
 
-	<div class="talkAlarm">
-		<div id="ch_alarm">상대방으로부터 메시지가 왔습니다</div>
-		<div id="ch_alarm_btns">
-			<button onclick="chatRoomHandler(event)">보기</button>
-			<button onclick="alarmClose()">닫기</button>
-		</div>
-	</div>
-
-	<div class="${login.gender == '남성' ? 'ch_bg_women' : 'ch_bg_men' }"
-		id="ch_oponent_profile"></div>
-
-	<div id="ch_profile_overlay"></div>
-	<div id="reqUseroverlay" class="hidden"></div>
-	
-<!-- 테스트 매칭 div -->
-	<div id="userInfo"></div>
-	<div id="overlay" class="hidden"></div>
 
 	<script>
 		// 로그인 중인 유저 확인
 		var user = '${login.userid}'
-		var username = '${login.username}'
-		var gender = '${login.gender}'
+ 		var nickname = '${login.nickname}'
 		var cpath = '${cpath}'
 		
 //		기존 stomp연결 로직		
@@ -1065,212 +147,5 @@ h1, h2 {
 		
 		
 		
-//		네트워크 불안정, 서버 재시작 시 stomp 재연결 로직
-		let stomp = null;
-		let isConnected = false;
-		let reconnectInterval = null;
-		
-		function connectStomp() {
-			const sockJS = new SockJS(cpath + '/endpoint')	// SockJS로 서버의 대문(Endpoint)에 접근
-			stomp = Stomp.over(sockJS)				// SockJS 통로 위에 STOMP 전화선을 깔기
-			
-//			heartbeat 설정 (서버와 10초마다 신호 주고받기)
-			stomp.heartbeat.outgoing = 10000;	// 클라이언트 -> 서버 (10초)
-			stomp.heartbeat.incoming = 10000;	// 서버 -> 클라이언트 (10초)
-			
-//			연결 시도
-			if (user !== '') {
-				stomp.connect({}, () => {		// SUCCESS 콜백: 연결 성공 시
-					console.log('STOMP 연결 성공!');
-					isConnected = true;
-					
-					// 재연결 시도 타이머가 돌아가고 있었다면 종료
-					if(reconnectInterval) {
-						clearInterval(reconnectInterval);
-						reconnectInterval = null;
-					}
-					
-					// 구독 + 알람보내기
-					stomp.subscribe('/broker/' + user, matchingHandler);
-				}, 
-				// ERROR 콜백: 연결이 끊기거나 에러 발생 시 자동 실행
-				(error) => {
-					console.error('STOMP 연결 끊김/에러 발생:', error);
-					isConnected = false;
-					
-					// 이미 재연결 시도 중이 아니라면 재연결 타이머 시작
-					if (!reconnectInterval) {
-						console.log('5초 후 재연결을 시도합니다...');
-						reconnectInterval = setInterval(() => {
-							console.log('STOMP 재연결 시도 중...');
-							connectStomp();
-						}, 5000);	// 5초마다 재연결 시도
-					}
-				})
-			}
-		}
-		// 최초 실행
-		connectStomp();
-		
-		
-		
-// 		이전 기본 구독
-/* 		if (user != '') {
-			stomp.connect({}, () => {
-				stomp.subscribe('/broker/' + user, matchingHandler)
-			})
-		} */
-		
-		async function matchingHandler(message) {
-			const content = JSON.parse(message.body);
-			const fromUser = content.from;
-			const toUser = content.to;
-			const text = content.text;
-			
-			if(text.includes('수락')) {
-				alert(toUser + text);
-				return;
-			} else if(text.includes('거부')) {
-				alert(toUser + text);
-				return;
-			}
-			
-			const url = cpath + '/testMatchAjax/userInfo/' + fromUser;
-			const info = await fetch(url).then(resp => resp.json());
-			
-			const date = new Date()
-			const age = date.getFullYear() - info.birthYear + 1
-			
-			let tag = '';
-			tag += '<div id="userProfile" style="background-image: url(\'' + cpath + '/upload/' + info.profile + '\')"></div>'
-			tag += '<div id="userCon">'
-			tag += '	<p>' + info.username + '(' + age + '세)</p>'
-			tag += '	<p>' + info.birthYear + '년 ' + info.birthMonth + '월 ' + info.birthDay + '일생</p>'
-			tag += '	<p>결혼여부 : ' + (info.marriedCount == 0 ? '없음' : (info.marriedCount == 1 ? '1회' : '2회이상')) + '</p>'
-			tag += '	<p>거주지역 : ' + info.residence + '</p>'
-			tag += '	<p>직업 : ' + info.job + '</p>'
-			tag += '	<p>연봉 : ' + info.salary + '</p>'
-			tag += '	<p>종교 : ' + info.religion + '</p>'
-			tag += '	<p style="font-size: 20px; margin: 3px auto;">자기소개</p>'
-			tag += '	<pre>' + info.introduce + '</pre>'
-			tag += '	<div class="userConBtn">'
-			tag += '		<div id="testDefer">보류</div>'
-			tag += '		<div id="testRefuse">거절</div>'
-			tag += '		<div id="testConsent">수락</div>'
-			tag += '	</div>'
-			tag += '</div>'
-			
-			const userInfo = document.getElementById('userInfo');
-			userInfo.innerHTML = tag;
-			
-			testInfoToggle()
-			const overlay = document.getElementById('overlay')
-			overlay.onclick = testInfoToggle
-			
-			const testConsent = document.getElementById('testConsent');
-			const testRefuse = document.getElementById('testRefuse');
-			const testDefer = document.getElementById('testDefer');
-			
-			
-			//수락버튼 눌렸을 시
-			testConsent.onclick = async function() {
-				const testConsentUrl = cpath + '/testMatchAjax/testConsent';
-				const ob = {respUser: toUser,
-							reqUser: fromUser}
-				const opt = {
-						method: 'POST',
-						body: JSON.stringify(ob),
-						headers: {
-							'Content-Type' : 'application/json;charset=utf-8'
-						}
-				}
-				const testConsentRow = await fetch(testConsentUrl, opt).then(resp => resp.text());
-				
-				// 상대방에게 수락했다는 알림보내기
-				if(testConsentRow === '1') {
-					testInfoToggle();
-					stomp.send('/broker/' + fromUser, {}, JSON.stringify({
-						to: username,
-						text: '님이 매칭을 수락하셨습니다!'
-					}))
-					setTimeout(() => {
-						alert('채팅을 확인해주세요')
-					}, 100);
-				}
-				
-			}
-			
-			// 거부버튼 눌렀을 시
-			testRefuse.onclick = async function() {
-				const testRefuseUrl = cpath + '/testMatchAjax/testRefuse'
-				const ob = {
-						reqUser: fromUser,
-						respUser: toUser
-				}
-				const opt = {
-						method: 'POST',
-						body: JSON.stringify(ob),
-						headers: {
-							'Content-Type' : 'application/json;charset=utf-8'
-						}
-				}
-				const testRefuseRow = await fetch(testRefuseUrl, opt).then(resp => resp.text());
-				
-				//상대에게 거부 알람 보내기
-				if (testRefuseRow === '1'){
-					testInfoToggle();
-					stomp.send('/broker/' + fromUser, {}, JSON.stringify({
-						to: username,
-						text: '님이 매칭을 거부하셨습니다 ㅜ'
-					}))
-					
-				}
-			}
-			
-			
-			// 보류버튼 눌렀을 시
-			testDefer.onclick = async function() {
-				testInfoToggle()
-				alert('매칭을 보류했어요 마이매칭을 확인해주세용')
-			}
-			
-			
-		}
-		
-		function testInfoToggle() {
-			const userInfo = document.getElementById('userInfo')
-			const overlay = document.getElementById('overlay')
-			userInfo.classList.toggle('heightToggle')
-			overlay.classList.toggle('hidden')
-		}
-		
-		
-		
-// 		여기까지
-
-		
-		async function ChUserProfileImgHandler() {
-			const url = cpath + '/member/spec?userid=' + user
-			const result = await fetch(url).then(resp => resp.json())
-			const userProfile = document.getElementById('ch_user_profile')
-			userProfile.src = cpath + '/upload/' + result.profile
-		}
-		
-		function toTopHandler() {
-			window.scrollTo(0, 0)
-		}
-		
-		window.onscroll = function() {
-			let scrollY = window.scrollY
-			const toTop = document.getElementById('ch_top_arrow')
-			if(scrollY >= 200) {
-				toTop.style.zIndex = 4
-				toTop.style.opacity = 1
-			}
-			else {
-				toTop.style.zIndex = -10
-				toTop.style.opacity = 0
-			}
-		}
 		
 	</script>

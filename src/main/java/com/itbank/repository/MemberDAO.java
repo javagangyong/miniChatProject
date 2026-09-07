@@ -7,28 +7,19 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import com.itbank.model.ConditionDTO;
 import com.itbank.model.MemberDTO;
-import com.itbank.model.ProfileDTO;
 
 public interface MemberDAO {
 
-	@Insert("insert into member(userid, userpw, username, email, gender, phoneNumber, birthYear, birthMonth, birthDay) "
-			+ "values(#{userid}, #{userpw}, #{username}, #{email}, #{gender}, #{phoneNumber}, #{birthYear}, #{birthMonth}, #{birthDay})")
+	@Insert("insert into member(userid, userpw, nickname, email) "
+			+ "values(#{userid}, #{userpw}, #{nickname}, #{email})")
 	int join(MemberDTO dto);
 
-	@Insert("insert into condition(userid, marriedCount, residence," + " education, job, salary, "
-			+ "religion, estate, owncar, " + "height, profile, introduce) "
-			+ "values(#{userid}, #{marriedCount}, #{residence}, #{education}, #{job}, "
-			+ "#{salary}, #{religion}, #{estate}, #{owncar}, " + "#{height}, #{profile}, #{introduce})")
-	int insertCondition(ConditionDTO dto);
 
 	@Select("select count(*) from member " + "where userid = #{userid}")
 	int check(String userid);
 
-	@Select("select member.*, condition.profile from member" + "    join condition "
-			+ "    on member.userid = condition.userid"
-			+ "    where member.userid = #{userid} and member.userpw = #{userpw}")
+	@Select("select * from member where userid = #{userid} and userpw = #{userpw}")
 	MemberDTO selectOne(MemberDTO dto);
 
 	@Select("select * from member where userid = #{userid} and username = #{username} and email = #{email}")
@@ -38,8 +29,6 @@ public interface MemberDAO {
 			+ "         userid = #{userid} and email = #{email}")
 	int updatePassword(MemberDTO dto);
 
-	@Select("select * from condition where userid = #{userid}")
-	ConditionDTO selectCondition(String userid);
 
 	@Select("select * from member where userid = #{userid}")
 	MemberDTO selectOneById(String userid);
@@ -52,12 +41,6 @@ public interface MemberDAO {
 			+ "      phoneNumber = #{phoneNumber}" + " where" + "      userid = #{userid}")
 	int update(MemberDTO dto);
 
-	@Update("update condition " + " set" + "      marriedCount = #{marriedCount}," + "      residence = #{residence},"
-			+ "      education = #{education}," + "      job = #{job}," + "      salary = #{salary},"
-			+ "      religion = #{religion}," + "      estate = #{estate}," + "      owncar = #{owncar},"
-			+ "      height = #{height}," + "      profile = #{profile}," + "      introduce = #{introduce}" + " where"
-			+ "      userid = #{userid}")
-	int conditionUpdate(ConditionDTO dto);
 
 	@Update("update member set userpw = #{userpw} where userid = #{userid}")
 	int pwUpdate(MemberDTO dto);
@@ -71,8 +54,6 @@ public interface MemberDAO {
 	@Update("update member set lastLoginDate = sysdate where userid = #{userid}")
 	int updateLastLogin(String userid);
 
-	@Select("select * from MemberInfo where userid = #{userid}")
-	ProfileDTO selectProfile(String userid);
 
 //	@Select("select userid from member where username = #{username} and email=#{email})")
 //	String findUserId(String username, String email);

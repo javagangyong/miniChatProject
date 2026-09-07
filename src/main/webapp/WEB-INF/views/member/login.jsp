@@ -2,21 +2,16 @@
     pageEncoding="UTF-8"%>
 <%@ include file="../header.jsp" %>
 <style>
-	header {
-		color: black;
-	}
-	
 	section {
 		padding-top: 95px;
 		width: 100%;
-		height: 920px;
+		height: 670px;
 		display: flex;
 		justify-content: center;
 	}
 	
 	.login_inner {
 		width: 700px;
-		margin-top: 150px;
 	}
 	
 	#loginForm {
@@ -43,18 +38,18 @@
 		margin-top: 20px;
 		width: 300px;
 		height: 50px;
-		border: 2px solid pink;
+		border: 2px solid #0b5ed7;
 		border-radius: 10px;
 		background-color: white;
 		font-size: 20px;
-		color: pink;
+		color: #0b5ed7;
 		text-align: center;
 		font-weight: bold;
 	}
 	
 	#loginBtn:hover {
 		cursor: pointer;
-		background-color: hotpink;
+		background-color: #0a58ca;
 	}
 	
 	.inputframe > input {
