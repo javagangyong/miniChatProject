@@ -139,11 +139,16 @@
  		var nickname = '${login.nickname}'
 		var cpath = '${cpath}'
 		
-//		기존 stomp연결 로직		
-// 		if (user != '') {
-// 			stomp.connect({}, chatListLoadHandler)
-// 			document.addEventListener('DOMContentLoaded', ChUserProfileImgHandler)
-// 		}
+		let stompClient = null;
+		
+		if(user !== '') {
+			const sockJS = new SockJS(cpath + '/endpoint')
+			stompClient = Stomp.over(sockJS)
+			
+			stompClient.connect({}, () => {
+				console.log('웹소켓 연결 성공')
+			})
+		}
 		
 		
 		
