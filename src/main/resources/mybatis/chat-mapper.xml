@@ -24,5 +24,9 @@
 	<select id="selectChatroom" resultType="com.itbank.model.ChatRoomDTO">
 		select * from chatRoom order by roomNO desc
 	</select>
+	
+	<select id="selectChatHistory" resultType="com.itbank.model.ChatMessageDTO">
+		select * from chatMessage where roomNo = #{roomNo} order by msgNo asc
+	</select>
 
 </mapper>

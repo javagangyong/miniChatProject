@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.itbank.model.ChatMessageDTO;
 import com.itbank.model.ChatRoomDTO;
 import com.itbank.model.MemberDTO;
 import com.itbank.service.ChatService;
@@ -36,5 +38,12 @@ public class HomeAjaxController {
 		List<ChatRoomDTO> list = cs.selectChatroom();
 		return list;
 	}
+	
+	@GetMapping("/chatHistory")
+	public List<ChatMessageDTO> chatHistory(@RequestParam("roomNo") int roomNo) {
+		List<ChatMessageDTO> chatHistoryList = cs.selectChatHistory(roomNo);
+		return chatHistoryList;
+	}
+
 
 }

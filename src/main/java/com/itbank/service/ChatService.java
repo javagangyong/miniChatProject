@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.itbank.model.ChatMessageDTO;
 import com.itbank.model.ChatRoomDTO;
 import com.itbank.model.ChatRoomJoinDTO;
 import com.itbank.repository.ChatDAO;
@@ -37,6 +38,10 @@ public class ChatService {
 
 	public List<ChatRoomDTO> selectChatroom() {
 		return dao.selectChatroom();
+	}
+
+	public List<ChatMessageDTO> selectChatHistory(int roomNo) {
+		return dao.selectChatHistory(roomNo);
 	}
 
 }

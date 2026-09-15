@@ -63,6 +63,9 @@
 		border-radius: 8px;
 		margin-bottom: 15px;
 	}
+	div.chatting_box:hover {
+		cursor: pointer;
+	}
 	div.center_main_title {
 		font-weight: bold;
 	}
@@ -139,6 +142,80 @@
 		background-color: rgba(0, 0, 0, 0.25);
 		z-index: 1;
 	}
+	
+	/* 화면 중앙 채팅 모달 스타일 */
+	.chat_modal_multi {
+		position: fixed;
+		bottom: 20px;
+		right: 20px;
+		width: 380px;
+		height: 630px;
+		border: 1px solid black;
+		border-radius: 12px;
+		box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+		background-color: #E3F2FD;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		z-index: 10;
+	}
+	div.chat_header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		font-weight: bold;
+		padding: 12px 15px;
+		background-color: #BBDEFB;
+	}
+	
+	/* 대화창 내부 및 스크롤 설정 */
+	div.chat_body {
+		padding: 15px;
+		flex: 1;		/* 다른 박스를 뺀 나머지 공간 차지 */
+		overflow-y: auto;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+	div.chat_message {
+		display: flex;
+		flex-direction: column;
+ 		max-width: 70%;		/* 말풍선이 길어지면 자동으로 줄바꿈 */
+	}
+	
+	/* 상대방 메세지 (왼쪽 흰색) */
+	div.other_chat {
+		align-self: flex-start;		/* align-items는 부모 align-self는 자식이 개인 적용 */	
+	}
+	div.other_chat .bubble {
+		background-color: #ffffff;
+		padding: 8px 12px;
+		border-radius: 10px;
+		margin-top: 3px;
+	}
+	
+	/* 내 메세지 (오른쪽) */
+	div.my_chat {
+		align-self: flex-end;
+	}
+	div.my_chat .bubble {
+		background-color: #FFF9C4;
+		padding: 8px 12px;
+		border-radius: 10px;
+	}
+	
+	div.chat_footer {
+		padding: 10px;
+		background-color: #ffffff;
+		display: flex;
+		gap: 5px;
+	}
+	div.chat_footer input {
+		flex: 1;
+		padding: 8px;
+		border: 1px solid #ddd;
+		border-radius: 4px;
+	}
 </style>
 <body>
 
@@ -181,6 +258,7 @@
 		</div>
 		
 		
+		<!-- 채팅방 만들기 -->
 		<div class="create_chatroom hidden">
 			<form method="POST" id="create_chatroom_form">
 				<p class="create_chatroom_font">채팅방 만들기</p>
@@ -196,6 +274,9 @@
 		</div>
 		<div class="create_chatroom_overlay hidden"></div>
 		
+		
+		<!-- 채팅방 모달 -->
+
 		
 	</div>
 	
@@ -258,16 +339,17 @@
 		})
 		
 		
+		const chatting_list = document.getElementById('chatting_list');
 		// 채팅방 리로드 함수
 		async function reloadChatListHandler() {
-			const chatting_list = document.getElementById('chatting_list');
 			const url = cpath + '/homeAjax/chatList';
 			const chatList = await fetch(url).then(resp => resp.json());
 			
 			// 스크립트 반복문
 			const tag = chatList.map(function(dto) {
 				let item = '';
-				item += '<div class="chatting_box">'
+				// data-*는 사용자 커스텀 데이터 공식표기법(?)
+				item += '<div class="chatting_box" data-room-no="' + dto.roomNo + '" data-room-title="' + dto.roomTitle + '">'
 				item += '	<div class="chat_no">' + dto.roomNo+ '</div>';
 				item += '	<div class="chat_title">' + dto.roomTitle + '</div>';
 				item += '	<div class="chat_maxUser">' + dto.maxUserCount + '명 제한</div>';
@@ -279,6 +361,135 @@
 			chatting_list.innerHTML = tag;
 		}
 		
+		
+		// 이미 열려있는 방 다시 눌렀을 때 중복 생성 방지(Set)
+		const activeRooms = new Set();
+		
+		// 채팅방 들어가기
+		chatting_list.addEventListener('click', async (e) => {
+			// 클릭된 요소 중에서 가장 가까운 .chatting_box 찾기
+			const chatting_box = e.target.closest('.chatting_box');
+			if(!chatting_box) return;	
+			
+			// 방번호 저장
+			const roomNo = chatting_box.dataset.roomNo;
+			console.log('선택한 방 번호: ', roomNo);
+			
+			// 방이름 저장
+			const roomTitle = chatting_box.dataset.roomTitle;
+			
+			// 이미 열려있는 채팅방이면 강조
+			if(activeRooms.has(roomNo)) {
+				const existingModal = document.getElementById('chat_modal_' + roomNo);
+				if(existingModal) existingModal.focus();
+				return;
+			}
+			
+			// 저장된 방번호로 이전 대화 내역 불러오기
+			const url = cpath + '/homeAjax/chatHistory?roomNo=' + roomNo
+			const chatMessage = await fetch(url).then(resp => resp.json());
+			
+			// 내가 입력, 상대방이 입력을 다르게 적용
+			const tag = chatMessage.map(function(dto) {
+				let item = '';
+				if(dto.senderId !== user) {	// 상대방 메세지
+					item += '<div class="chat_message other_chat">';
+					item += '	<div class="sender">' + dto.senderId + '</div>';
+					item += '	<div class="bubble">' + dto.messageContent + '</div>';
+					item += '</div>';
+				} else {	// 내 메세지
+					item += '<div class="chat_message my_chat">'
+					item += '	<div class="bubble">' + dto.messageContent + '</div>';
+					item += '</div>';
+				}
+				return item;
+			}).join('');
+			
+			// ※※ 이 방 전용 동적 모달 HTML 생성하기 ※※
+			const modalDiv = document.createElement('div');
+			modalDiv.className = 'chat_modal_multi';
+			modalDiv.id = 'chat_modal_' + roomNo;
+			
+			let modalTag = '';
+			modalTag += '<div class="chat_header">';
+			modalTag += '	<span>' + roomTitle + '</span>';
+			modalTag += '	<button id="btn_close_chat" onclick="closeChat('+ roomNo +')">X</button>';
+			modalTag += '</div>';
+			modalTag += '<div class="chat_body" id="chat_body_'+ roomNo +'">';
+			modalTag += 	tag;
+			modalTag += '</div>';
+			modalTag += '<div class="chat_footer">';
+			modalTag += '	<input type="text" id="input_'+ roomNo +'" placeholder="메세지를 입력하세요.." onkeydown="handleKeyPress(event, '+ roomNo +')">';
+			modalTag += '	<button onclick="sendChatMessage('+ roomNo +')">전송</button>';
+			modalTag += '</div>';
+			
+			modalDiv.innerHTML = modalTag;
+			
+			document.body.appendChild(modalDiv);
+			activeRooms.add(roomNo);	// 활성화된 방 등록
+			
+			const chatBody = document.getElementById('chat_body_' + roomNo);
+			// 모달창 그리기 전에 실행 방지
+			setTimeout(() => {
+				//	스크롤 위에서부터 = 스크롤 전체길이(만큼 내려라)
+				chatBody.scrollTop = chatBody.scrollHeight;
+			}, 10);
+			
+			// 해당 방 동시 구독하기
+			subscribeToRoom(roomNo);
+		})
+		
+		
+		
+		// 각 방별 구독 객체(구독 해제용)
+		const subscriptons = {};
+		
+		function subscribeToRoom(roomNo) {
+			if(!stompClient || !stompClient.connected) return;
+			
+			// 구독 중이 아니라면 구독 시작 + 실시간 채팅
+			if(!subscriptons[roomNo]) {
+				subscriptons[roomNo] = stompClient.subscribe('/broker/' + roomNo, (response) => {
+					const dto = JSON.parse(response.body);
+					
+					const targetChatBody = document.getElementById('chat_body_' + roomNo);
+					if(targetChatBody) {	// if이유는 모달창 껐을때 들어오는 메세지로 인한 오류 방지
+						let item = '';
+						if(dto.senderId !== user) {	// 상대방 메세지
+							item += '<div class="chat_message other_chat">';
+							item += '	<div class="sender">' + dto.senderId + '</div>';
+							item += '	<div class="bubble">' + dto.messageContent + '</div>';
+							item += '</div>';
+						} else {	// 내 메세지
+							item += '<div class="chat_message my_chat">'
+							item += '	<div class="bubble">' + dto.messageContent + '</div>';
+							item += '</div>';
+						}
+						// insertAdjacentHTML 'beforeend'는 밑에 추가로 하나씩 붙이는거
+						targetChatBody.insertAdjacentHTML('beforeend', item);
+						targetChatBody.scrollTop = targetChatBody.scrollHeight;
+					}
+				});
+				console.log(roomNo + '번 방 실시간 구독 등록 완료');
+			}
+		}
+		
+		
+		// 채팅방 창닫기 x
+		function closeChat(roomNo) {
+			// 구독 먼저 해제
+			if(subscriptons[roomNo]) {
+				subscriptons[roomNo].unsubscribe();
+				delete subscriptons[roomNo];
+			}
+			
+			// 화면에서 모달 요소 삭제
+			const modal = document.getElementById('chat_modal_' + roomNo);
+			if(modal) modal.remove();
+			activeRooms.delete(roomNo);
+		}
+		
+		// 화면 로드시 채팅리스트 새로고침
 		document.addEventListener("DOMContentLoaded", reloadChatListHandler);
 		
 		
