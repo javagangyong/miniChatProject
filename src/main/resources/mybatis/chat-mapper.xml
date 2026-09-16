@@ -28,5 +28,10 @@
 	<select id="selectChatHistory" resultType="com.itbank.model.ChatMessageDTO">
 		select * from chatMessage where roomNo = #{roomNo} order by msgNo asc
 	</select>
+	
+	<insert id="insertChatMessage">
+		insert into chatMessage(roomNo, senderId, messageContent)
+			values(#{roomNo}, #{senderId}, #{messageContent})
+	</insert>
 
 </mapper>

@@ -204,13 +204,13 @@
 		border-radius: 10px;
 	}
 	
-	div.chat_footer {
+	.chat_footer {
 		padding: 10px;
 		background-color: #ffffff;
 		display: flex;
 		gap: 5px;
 	}
-	div.chat_footer input {
+	.chat_footer input {
 		flex: 1;
 		padding: 8px;
 		border: 1px solid #ddd;
@@ -381,7 +381,10 @@
 			// 이미 열려있는 채팅방이면 강조
 			if(activeRooms.has(roomNo)) {
 				const existingModal = document.getElementById('chat_modal_' + roomNo);
-				if(existingModal) existingModal.focus();
+				if(existingModal) {
+					document.querySelectorAll('.chat_modal_multi').forEach(m => m.style.zIndex = "100");
+					existingModal.style.zIndex = "1000";
+				}
 				return;
 			}
 			
@@ -410,18 +413,26 @@
 			modalDiv.className = 'chat_modal_multi';
 			modalDiv.id = 'chat_modal_' + roomNo;
 			
+			document.querySelectorAll('.chat_modal_multi').forEach(m => m.style.zIndex = "100");
+			modalDiv.style.zIndex = "1000";
+			
+			// 여러개 띄울 때 계단식으로 띄우기
+			const offset = activeRooms.size * 40;
+			modalDiv.style.right = (20 + offset) + 'px';
+			modalDiv.style.bottom = (20 + offset) + 'px';
+			
 			let modalTag = '';
 			modalTag += '<div class="chat_header">';
 			modalTag += '	<span>' + roomTitle + '</span>';
-			modalTag += '	<button id="btn_close_chat" onclick="closeChat('+ roomNo +')">X</button>';
+			modalTag += '	<button id="btn_close_chat" onclick="closeChat(\''+ roomNo +'\')" type="button">X</button>';
 			modalTag += '</div>';
 			modalTag += '<div class="chat_body" id="chat_body_'+ roomNo +'">';
 			modalTag += 	tag;
 			modalTag += '</div>';
-			modalTag += '<div class="chat_footer">';
-			modalTag += '	<input type="text" id="input_'+ roomNo +'" placeholder="메세지를 입력하세요.." onkeydown="handleKeyPress(event, '+ roomNo +')">';
-			modalTag += '	<button onclick="sendChatMessage('+ roomNo +')">전송</button>';
-			modalTag += '</div>';
+			modalTag += '<form onsubmit="sendChatMessage(event, this, \''+ roomNo +'\')" class="chat_footer">';
+			modalTag += '	<input type="text" name="messageContent" placeholder="메세지를 입력하세요..">';
+			modalTag += '	<button type="submit">전송</button>';
+			modalTag += '</form>';
 			
 			modalDiv.innerHTML = modalTag;
 			
@@ -442,14 +453,15 @@
 		
 		
 		// 각 방별 구독 객체(구독 해제용)
-		const subscriptons = {};
+		const subscriptions = {};
 		
 		function subscribeToRoom(roomNo) {
+			roomNo = String(roomNo);	// 타입 안정성 확보
 			if(!stompClient || !stompClient.connected) return;
 			
 			// 구독 중이 아니라면 구독 시작 + 실시간 채팅
-			if(!subscriptons[roomNo]) {
-				subscriptons[roomNo] = stompClient.subscribe('/broker/' + roomNo, (response) => {
+			if(!subscriptions[roomNo]) {
+				subscriptions[roomNo] = stompClient.subscribe('/broker/' + roomNo, (response) => {
 					const dto = JSON.parse(response.body);
 					
 					const targetChatBody = document.getElementById('chat_body_' + roomNo);
@@ -474,13 +486,33 @@
 			}
 		}
 		
+		// 메세지 보내기
+		function sendChatMessage(e, form, roomNo) {
+			e.preventDefault();
+			const inputEl = form.messageContent;
+			const messageContent = inputEl.value;
+			
+			if(messageContent === '') return;	// 빈 메세지 방지
+			
+			stompClient.send('/app/sendChatMessage/' + roomNo, {}, JSON.stringify({
+				roomNo: roomNo,
+				messageContent: messageContent,
+				senderId: user
+			}))
+			
+			// 입력 후 빈칸 처리 및 포커스 유지
+			inputEl.value = '';
+			inputEl.focus();
+		}
+		
 		
 		// 채팅방 창닫기 x
 		function closeChat(roomNo) {
+			roomNo = String(roomNo);	// 타입 변환 에러 방지
 			// 구독 먼저 해제
-			if(subscriptons[roomNo]) {
-				subscriptons[roomNo].unsubscribe();
-				delete subscriptons[roomNo];
+			if(subscriptions[roomNo]) {
+				subscriptions[roomNo].unsubscribe();
+				delete subscriptions[roomNo];
 			}
 			
 			// 화면에서 모달 요소 삭제

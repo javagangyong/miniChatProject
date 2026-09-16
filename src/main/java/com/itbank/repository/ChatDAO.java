@@ -17,5 +17,7 @@ public interface ChatDAO {
 
 	List<ChatMessageDTO> selectChatHistory(int roomNo);
 
+	int insertChatMessage(ChatMessageDTO dto);
+
 
 }

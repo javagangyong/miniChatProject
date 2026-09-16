@@ -6,15 +6,15 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import com.itbank.model.ChatMessageDTO;
 import com.itbank.model.MemberDTO;
-//import com.itbank.model.MessageDTO;
-//import com.itbank.service.ChatService;
+import com.itbank.service.ChatService;
 
 @Controller
 public class StompController {
 
-//	@Autowired
-//	private ChatService cs;
+	@Autowired
+	private ChatService cs;
 
 //	@MessageMapping("/register")
 //	@SendTo("/broker/admin")
@@ -23,6 +23,14 @@ public class StompController {
 //		dto.setText(userid + "님의 스펙이 등록되었습니다");
 //		return dto;
 //	}
+	
+	@MessageMapping("/sendChatMessage/{roomNo}")
+	@SendTo("/broker/{roomNo}")
+	public ChatMessageDTO sendChatMessage(ChatMessageDTO dto) {
+		int row = cs.insertChatMessage(dto);
+		System.out.println(row != 1 ? "챗메세지 db저장 실패" : "");
+		return dto;
+	}
 
 	@MessageMapping("/ping")
 	public void ping() {

@@ -44,4 +44,8 @@ public class ChatService {
 		return dao.selectChatHistory(roomNo);
 	}
 
+	public int insertChatMessage(ChatMessageDTO dto) {
+		return dao.insertChatMessage(dto);
+	}
+
 }
