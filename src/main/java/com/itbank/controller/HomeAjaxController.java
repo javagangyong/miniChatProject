@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.itbank.model.ChatMessageDTO;
 import com.itbank.model.ChatRoomDTO;
+import com.itbank.model.ChatRoomJoinDTO;
 import com.itbank.model.MemberDTO;
 import com.itbank.service.ChatService;
 
@@ -40,9 +41,22 @@ public class HomeAjaxController {
 	}
 	
 	@GetMapping("/chatHistory")
-	public List<ChatMessageDTO> chatHistory(@RequestParam("roomNo") int roomNo) {
-		List<ChatMessageDTO> chatHistoryList = cs.selectChatHistory(roomNo);
+	public List<ChatMessageDTO> chatHistory(@RequestParam("roomNo") int roomNo,
+											@RequestParam("userid") String userid) {
+		List<ChatMessageDTO> chatHistoryList = cs.selectChatHistory(roomNo, userid);
 		return chatHistoryList;
+	}
+	
+	@PostMapping("/insertRoomJoin")
+	public int insertRoomJoin(@RequestBody ChatRoomJoinDTO joinDto) {
+		int row = cs.insertRoomJoin(joinDto);
+		return row;
+	}
+	
+	@PostMapping("/updateWatching")
+	public int updateWatching(@RequestBody ChatRoomJoinDTO joinDto) {
+		int row = cs.updateWatching(joinDto);
+		return row;
 	}
 
 
