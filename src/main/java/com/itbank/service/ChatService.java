@@ -40,12 +40,22 @@ public class ChatService {
 		return dao.selectChatroom();
 	}
 
-	public List<ChatMessageDTO> selectChatHistory(int roomNo) {
-		return dao.selectChatHistory(roomNo);
+	public List<ChatMessageDTO> selectChatHistory(int roomNo, String userid) {
+		return dao.selectChatHistory(roomNo, userid);
 	}
 
 	public int insertChatMessage(ChatMessageDTO dto) {
 		return dao.insertChatMessage(dto);
+	}
+
+	public int insertRoomJoin(ChatRoomJoinDTO joinDto) {
+		joinDto.setIsWatching("Y");
+		joinDto.setLastReadMsgNo(0);
+		return dao.insertChatRoomJoin(joinDto);
+	}
+
+	public int updateWatching(ChatRoomJoinDTO joinDto) {
+		return dao.updateWatching(joinDto);
 	}
 
 }

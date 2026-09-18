@@ -17,7 +17,12 @@
 	</insert>
 	
 	<insert id="insertChatRoomJoin">
-		insert into chatroomJoin(roomNo, userid, isWatching, lastReadMsgNo)
+<!-- 	merge는 원래 on 조건절 비교로 있으면 update, 없으면 insert를 한번에 처리하기 위한 구문이지만 -->
+<!-- 	지금은 있으면 pass, 없으면 insert로 처리 -->
+		merge into chatRoomJoin c using dual
+			on (c.roomNo = #{roomNo} and c.userid = #{userid})
+		when not matched then
+			insert (roomNo, userid, isWatching, lastReadMsgNo)
 			values(#{roomNo}, #{userid}, #{isWatching}, #{lastReadMsgNo})
 	</insert>
 	
@@ -26,12 +31,21 @@
 	</select>
 	
 	<select id="selectChatHistory" resultType="com.itbank.model.ChatMessageDTO">
-		select * from chatMessage where roomNo = #{roomNo} order by msgNo asc
+		select * from chatMessage where roomNo = #{roomNo} 
+			and sendTime >= (select joinDate from chatRoomJoin 
+			where roomNo = #{roomNo} and userid = #{userid}) 
+			order by msgNo asc
 	</select>
 	
 	<insert id="insertChatMessage">
 		insert into chatMessage(roomNo, senderId, messageContent)
 			values(#{roomNo}, #{senderId}, #{messageContent})
 	</insert>
+	
+	<update id="updateWatching">
+		update chatRoomJoin set isWatching = #{isWatching}
+			where roomNo = #{roomNo} and userid = #{userid}
+	</update>
+	
 
 </mapper>

@@ -112,7 +112,7 @@
 	
 	div.create_chatroom {
 		position: absolute;
-		top: 45%;
+		top: 35%;
 		left: 50%;
 		transform: translate(-50%, -50%);
 		width: 250px;
@@ -167,6 +167,19 @@
 		padding: 12px 15px;
 		background-color: #BBDEFB;
 	}
+	.btns_header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		width: 120px;
+	}
+	.btn_unsubscribe {
+		color: #757575;
+   		font-size: 14px; 
+	}
+	.btn_unsubscribe:hover {
+		color: #E57373;
+	}
 	
 	/* 대화창 내부 및 스크롤 설정 */
 	div.chat_body {
@@ -215,6 +228,24 @@
 		padding: 8px;
 		border: 1px solid #ddd;
 		border-radius: 4px;
+	}
+	
+	/* 채팅방 내리기 */
+	#chat_dock_bar {
+		position: fixed;
+		display: flex;
+		bottom: 0;
+		left: 20px;
+		gap: 8px;
+		z-index: 1000;
+	}
+	.chat_chip {
+		padding: 8px 14px;
+		background-color: #333;
+		color: #fff;
+		border-radius: 10px 10px 0 0;
+		cursor: pointer;
+		font-size: 13px;
 	}
 </style>
 <body>
@@ -275,7 +306,8 @@
 		<div class="create_chatroom_overlay hidden"></div>
 		
 		
-		<!-- 채팅방 모달 -->
+		<!-- 채팅방 최소화 바 -->
+		<div id="chat_dock_bar"></div>
 
 		
 	</div>
@@ -388,9 +420,22 @@
 				return;
 			}
 			
+			// 방 참여 DB저장
+			const chatRoomJoinUrl = cpath + '/homeAjax/insertRoomJoin';
+			const ob = {roomNo: roomNo, userid: user}
+			const opt = {
+					method: 'POST',
+					body: JSON.stringify(ob),
+					headers: {
+						'Content-Type' : 'application/json;charset=utf-8'
+					}
+			}
+			const chatRoomJoinRow = await fetch(chatRoomJoinUrl, opt).then(resp => resp.text());
+			console.log(chatRoomJoinRow.trim() === '1' ? '방 참여 정보 저장' : '기존 참여 방 또는 방 참여 저장 실패')
+			
 			// 저장된 방번호로 이전 대화 내역 불러오기
-			const url = cpath + '/homeAjax/chatHistory?roomNo=' + roomNo
-			const chatMessage = await fetch(url).then(resp => resp.json());
+			const chatHistoryUrl = cpath + '/homeAjax/chatHistory?roomNo='+ roomNo +'&userid=' + user;
+			const chatMessage = await fetch(chatHistoryUrl).then(resp => resp.json());
 			
 			// 내가 입력, 상대방이 입력을 다르게 적용
 			const tag = chatMessage.map(function(dto) {
@@ -424,7 +469,12 @@
 			let modalTag = '';
 			modalTag += '<div class="chat_header">';
 			modalTag += '	<span>' + roomTitle + '</span>';
-			modalTag += '	<button id="btn_close_chat" onclick="closeChat(\''+ roomNo +'\')" type="button">X</button>';
+			modalTag += '	<div class="btns_header">';
+			modalTag += '		<button class="btn_unsubscribe" onclick="unsubscribeChat(\''+ roomNo +'\')" type="button">방 나가기</button>';
+			modalTag += '		<button onclick="minimizedChat(\''+ roomNo +'\', \''+ roomTitle +'\')" type="button">ㅡ</button>';
+			modalTag += '		<button onclick="exitChat(\''+ roomNo +'\')" type="button">X</button>';
+			modalTag += '		';
+			modalTag += '	</div>';
 			modalTag += '</div>';
 			modalTag += '<div class="chat_body" id="chat_body_'+ roomNo +'">';
 			modalTag += 	tag;
@@ -446,6 +496,8 @@
 				chatBody.scrollTop = chatBody.scrollHeight;
 			}, 10);
 			
+			// 창 껐다 다시 켰을때를 위해
+			updateWatching(roomNo, user, 'Y');
 			// 해당 방 동시 구독하기
 			subscribeToRoom(roomNo);
 		})
@@ -489,7 +541,7 @@
 		// 메세지 보내기
 		function sendChatMessage(e, form, roomNo) {
 			e.preventDefault();
-			const inputEl = form.messageContent;
+			const inputEl = form.messageContent;	// 입력칸
 			const messageContent = inputEl.value;
 			
 			if(messageContent === '') return;	// 빈 메세지 방지
@@ -506,8 +558,47 @@
 		}
 		
 		
-		// 채팅방 창닫기 x
-		function closeChat(roomNo) {
+		// 채팅방 내리기
+		function minimizedChat(roomNo, roomTitle) {
+			const modalDiv = document.getElementById('chat_modal_' + roomNo);
+			if(modalDiv) modalDiv.classList.add('hidden');
+			
+			// 바닥 칩 생성
+			const chip = document.createElement('div');
+			chip.id = 'chat_chip_' + roomNo;
+			chip.className = 'chat_chip';
+			chip.innerText = '💬 ' + roomTitle;
+			
+			// 칩 클릭시 모달 복원
+			chip.addEventListener('click', () => {
+				restoreChatModal(roomNo);
+			})
+			
+			// 바닥 도크바에 추가
+			document.getElementById('chat_dock_bar').appendChild(chip);
+			updateWatching(roomNo, user, 'N');	// 이즈왓칭 갱신
+		}
+		
+		// 칩 누를시 채팅방 복원
+		function restoreChatModal(roomNo) {
+			const chip = document.getElementById('chat_chip_' + roomNo);
+			if(chip) chip.remove();
+			
+			const modalDiv = document.getElementById('chat_modal_' + roomNo);
+			if(modalDiv) modalDiv.classList.remove('hidden');
+			updateWatching(roomNo, user, 'Y');	// 이즈왓칭 갱신
+		}
+		
+		// 채팅방 끄기
+		function exitChat(roomNo) {
+			const chatModal = document.getElementById('chat_modal_' + roomNo);
+			chatModal.remove();			// 채팅방 모달 삭제
+			activeRooms.delete(roomNo);	// 열려있는 방 삭제
+			updateWatching(roomNo, user, 'N');	// 이즈왓칭 갱신
+		}
+		
+		// 채팅방 나가기
+		function unsubscribeChat(roomNo) {
 			roomNo = String(roomNo);	// 타입 변환 에러 방지
 			// 구독 먼저 해제
 			if(subscriptions[roomNo]) {
@@ -519,6 +610,25 @@
 			const modal = document.getElementById('chat_modal_' + roomNo);
 			if(modal) modal.remove();
 			activeRooms.delete(roomNo);
+		}
+		
+		// 이즈왓칭 변경
+		async function updateWatching(roomNo, user, isWatching) {
+			const url = cpath + '/homeAjax/updateWatching';
+			const ob = {
+					roomNo: roomNo,
+					userid: user,
+					isWatching: isWatching
+			}
+			const opt = {
+					method: 'POST',
+					body: JSON.stringify(ob),
+					headers: {
+						'Content-Type': 'application/json;charset=utf-8'
+					}
+			}
+			const row = await fetch(url, opt).then(resp => resp.text());
+			console.log(row.trim() !== "1" ? roomNo + '번방 이즈왓칭 실패' : roomNo + '번방 이즈왓칭 성공!');
 		}
 		
 		// 화면 로드시 채팅리스트 새로고침
