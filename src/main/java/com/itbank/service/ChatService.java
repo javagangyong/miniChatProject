@@ -58,4 +58,12 @@ public class ChatService {
 		return dao.updateWatching(joinDto);
 	}
 
+	public int countMyRooms(String userid) {
+		return dao.countMyRooms(userid);
+	}
+
+	public List<ChatRoomDTO> selectMyRooms(String userid) {
+		return dao.selectMyRooms(userid);
+	}
+
 }

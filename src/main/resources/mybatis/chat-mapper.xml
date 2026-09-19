@@ -47,5 +47,15 @@
 			where roomNo = #{roomNo} and userid = #{userid}
 	</update>
 	
+	<select id="countMyRooms">
+		select count(*) from chatRoomJoin where userid = #{userid}
+	</select>
+	
+	<select id="selectMyRooms" resultType="com.itbank.model.ChatRoomDTO">
+		select r.* from chatroom r join chatRoomJoin j
+			on r.roomNo = j.roomNo
+			where j.userid = #{userid}
+	</select>
+	
 
 </mapper>
