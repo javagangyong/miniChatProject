@@ -58,6 +58,18 @@ public class HomeAjaxController {
 		int row = cs.updateWatching(joinDto);
 		return row;
 	}
+	
+	@GetMapping("/myRoomsCount")
+	public int myRoomsCount(@RequestParam("userid") String userid) {
+		int row = cs.countMyRooms(userid);
+		return row;
+	}
+	
+	@GetMapping("/selectMyRooms")
+	public List<ChatRoomDTO> myRoomList(@RequestParam("userid") String userid) {
+		List<ChatRoomDTO> list = cs.selectMyRooms(userid);
+		return list;
+	}
 
 
 }

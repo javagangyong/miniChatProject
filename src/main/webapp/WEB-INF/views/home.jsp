@@ -55,17 +55,6 @@
 		font-weight: bold;
 		width: 260px;
 	}
-	div.chatting_box {
-		width: 450px;
-		height: 150px;
-		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-		background-color: #ffffff;
-		border-radius: 8px;
-		margin-bottom: 15px;
-	}
-	div.chatting_box:hover {
-		cursor: pointer;
-	}
 	div.center_main_title {
 		font-weight: bold;
 	}
@@ -74,10 +63,204 @@
 		width: 450px;
 	}
 	
-	#user_profile_img {
-		width: 100px;
-		height: 100px;
+	
+	/* 우측 프로필 카드 전체 박스 */
+	/* 우측 프로필 카드 전체 박스 */
+	.profile_card {
+	  width: 240px;
+	  padding: 24px 16px;
+	  background-color: #ffffff;
+	  border-radius: 12px;
+	  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+	  display: flex;
+	  flex-direction: column;
+	  align-items: center;
+	  box-sizing: border-box;
 	}
+	
+	/* 프로필 이미지 */
+	.profile_img {
+	  width: 90px;
+	  height: 110px;
+	  object-fit: cover;
+	  border-radius: 8px;
+	  margin-bottom: 12px;
+	}
+	
+	/* 이름 및 아이디 */
+	.profile_name {
+	  font-size: 16px;
+	  font-weight: 700;
+	  color: #1e293b;
+	  margin-bottom: 2px;
+	}
+	
+	.profile_id {
+	  font-size: 13px;
+	  color: #64748b;
+	  margin-bottom: 20px;
+	}
+	
+	/* [핵심] 내가 참여 중인 방 버튼 */
+	.btn_my_rooms {
+	  width: 100%;
+	  padding: 10px 14px;
+	  background-color: #f1f5f9;
+	  border: 1px solid #e2e8f0;
+	  border-radius: 8px;
+	  display: flex;
+	  align-items: center;
+	  justify-content: space-between;
+	  cursor: pointer;
+	  transition: all 0.2s ease;
+	  margin-bottom: 12px;
+	}
+	
+	.btn_my_rooms:hover {
+	  background-color: #e2e8f0;
+	  border-color: #cbd5e1;
+	}
+	
+	.btn_my_rooms .label {
+	  font-size: 13px;
+	  font-weight: 600;
+	  color: #334155;
+	}
+	
+	/* 참여 방 개수 배지 */
+	.btn_my_rooms .badge_count {
+	  background-color: #2563eb;
+	  color: #ffffff;
+	  font-size: 11px;
+	  font-weight: 700;
+	  padding: 2px 8px;
+	  border-radius: 12px;
+	}
+	
+	/* 로그아웃 버튼 */
+	.btn_logout {
+	  background: none;
+	  border: none;
+	  font-size: 13px;
+	  color: #94a3b8;
+	  cursor: pointer;
+	  text-decoration: underline;
+	  transition: color 0.2s ease;
+	}
+	
+	.btn_logout:hover {
+	  color: #ef4444;
+	}
+	
+	
+	/* 채팅방 리스트 */
+	/* 채팅방 리스트 */
+	div.chatting_box {
+		width: 450px;
+		height: 75px;
+		padding: 0 18px;
+		background-color: #ffffff;
+		border: 1px solid #edf2f7;
+		border-radius: 12px;
+		margin-bottom: 12px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+		
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		box-sizing: border-box;
+		transition: all 0.2s ease-in-out;
+	}
+	
+	/* 마우스 호버 시 살짝 떠오르는 반응형 효과 */
+	div.chatting_box:hover {
+		cursor: pointer;
+		transform: translateY(-2px);
+		box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+		border-color: #cbd5e1;
+	}
+	
+	/* 왼쪽 영역 (번호 + 타이틀/타입 + 정원) */
+	.chat_left {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		overflow: hidden;
+	}
+	
+	/* 방 번호 배지 */
+	.chat_no {
+		font-size: 12px;
+		font-weight: 700;
+		color: #64748b;
+		background-color: #f1f5f9;
+		padding: 6px 9px;
+		border-radius: 8px;
+		white-space: nowrap;
+	}
+	
+	/* 방 정보 감싸는 블록 */
+	.chat_info {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		overflow: hidden;
+	}
+	
+	/* 타입 배지와 제목 줄 */
+	.chat_title_wrap {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		overflow: hidden;
+	}
+	
+	/* 방 제목 (길어지면 ... 처리) */
+	.chat_title {
+		font-size: 15px;
+		font-weight: 600;
+		color: #1e293b;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	
+	/* 방 타입 태그 (그룹/1:1 색상 구분) */
+	.badge_type {
+		font-size: 11px;
+		font-weight: 600;
+		padding: 2px 6px;
+		border-radius: 4px;
+		white-space: nowrap;
+	}
+	.badge_type.group {
+		color: #2563eb;
+		background-color: #eff6ff;
+	}
+	.badge_type.direct {
+		color: #059669;
+		background-color: #ecfdf5;
+	}
+	
+	/* 정원 제한 표시 */
+	.chat_maxUser {
+		font-size: 12px;
+		color: #94a3b8;
+	}
+	
+	/* 오른쪽 입장 화살표 */
+	.enter_arrow {
+		font-size: 16px;
+		color: #cbd5e1;
+		font-weight: bold;
+		transition: color 0.2s ease, transform 0.2s ease;
+	}
+	
+	div.chatting_box:hover .enter_arrow {
+		color: #2563eb;
+		transform: translateX(3px); /* 호버 시 화살표가 오른쪽으로 슬쩍 이동 */
+	}
+	
 	
 	
 	/* 채팅방 만들기 스타일 */
@@ -255,7 +438,9 @@
 		<div class="left_side_bar">
 			<div class="sidebar_title">메뉴(Menu)</div>
 			<div class="sidebar_menu">
-				<div><i class="fa-solid fa-earth-americas"></i> 전체 채팅방</div>
+				<button type="button" id="allChatRoom">
+					<i class="fa-solid fa-earth-americas"></i>전체 채팅방
+				</button>
 				<div><i class="fa-solid fa-lock"></i> 1:1 비밀채팅</div>
 				<div><i class="fa-solid fa-user-group"></i> 친구 목록</div>
 				<div><i class="fa-regular fa-comments"></i> 
@@ -263,23 +448,37 @@
 				</div>
 			</div>
 		</div>
+		
 		<div class="center_main">
-			<div class="center_main_title">참여 가능한 채팅방</div>
+			<div class="center_main_title"></div>
 			<div class="new_chat"><i class="fa-solid fa-plus"></i>
 				<button id="create_chatroom_btn">새 채팅방 만들기</button>
 			</div>
 			<div id="chatting_list"></div>
 		</div>
+		
 		<div class="right_profile">
 			<div class="sidebar_title">내 프로필 / 현황</div>
 			<div class="sidebar_menu">
 				<c:if test="${not empty login }">
-					<div><img id="user_profile_img"></div>
-					<div><i class="fa-solid fa-circle-user"></i>${login.nickname }님</div>
-					<div>${login.userid }</div>					
-					<div>참여중인 방 : 3개</div>
-					<div>읽지 않은 채팅 : 2개</div>
-					<div><a href="${cpath }/member/logout">로그아웃</a></div>
+					<div class="profile_card">
+					  <!-- 프로필 이미지 및 기본 정보 -->
+					  <img id="user_profile_img" class="profile_img" alt="프로필">
+					  <div class="profile_name">${login.nickname }님</div>
+					  <div class="profile_id">${login.userid }</div>
+					
+					  <!-- 참여 중인 방 전용 버튼 (클릭 시 내가 들어간 방만 필터링) -->
+					  <button type="button" class="btn_my_rooms" id="btnMyRooms">
+					    <span class="label">💬 내가 참여 중인 방</span>
+					    <span class="badge_count" id="myRoomsCount"></span>
+					  </button>
+					
+					  <!-- 로그아웃 버튼 -->
+					  <a href="${cpath }/member/logout">
+					  	<button type="button" class="btn_logout">로그아웃</button>
+					  </a>
+					  
+					</div>
 				</c:if>
 				<c:if test="${empty login }">
 					<div><a href="${cpath }/member/login">로그인</a></div>
@@ -325,7 +524,15 @@
 			user_profile_img.src = cpath + '/upload/' + profile;
 		}
 		
-		userProfileImgHandler()
+		
+		// 전체 채팅방(기본 화면)
+		const allChatRoom = document.getElementById('allChatRoom');
+		allChatRoom.addEventListener('click', (e) => {
+			const center_main_title = document.querySelector('.center_main_title');
+			center_main_title.innerHTML = '참여 가능한 채팅방';
+			center_main_title.classList.remove('hidden');
+			reloadChatListHandler();
+		})
 		
 		// 채팅방 만들기 모달 생성
 		const create_chatroom = document.querySelector('.create_chatroom');
@@ -379,19 +586,38 @@
 			
 			// 스크립트 반복문
 			const tag = chatList.map(function(dto) {
-				let item = '';
-				// data-*는 사용자 커스텀 데이터 공식표기법(?)
-				item += '<div class="chatting_box" data-room-no="' + dto.roomNo + '" data-room-title="' + dto.roomTitle + '">'
-				item += '	<div class="chat_no">' + dto.roomNo+ '</div>';
-				item += '	<div class="chat_title">' + dto.roomTitle + '</div>';
-				item += '	<div class="chat_maxUser">' + dto.maxUserCount + '명 제한</div>';
-				item += '</div>';
-				
-				return item;
-			}).join(''); // 배열안의 요소들을 하나의 긴 문자열로 싹 합쳐라
+			    let item = '';
+			    
+			    // 방 타입별 아이콘 및 텍스트 설정
+			    let isGroup = dto.roomType === 'group';
+			    let typeBadge = isGroup ? '<span class="badge_type group">그룹</span>' : '<span class="badge_type direct">1:1</span>';
+			    let userCountText = isGroup ? dto.maxUserCount + '명 제한' : '개인 채팅';
+			
+			 	// data-*는 사용자 커스텀 데이터 공식표기법(?)
+			    item += '<div class="chatting_box" data-room-no="' + dto.roomNo + '" data-room-title="' + dto.roomTitle + '">';
+			    item += '	<div class="chat_left">';
+			    item += '		<span class="chat_no">#' + dto.roomNo + '</span>';
+			    item += '		<div class="chat_info">';
+			    item += '			<div class="chat_title_wrap">';
+			    item += 				typeBadge;
+			    item += '				<span class="chat_title">' + dto.roomTitle + '</span>';
+			    item += '			</div>';
+			    item += '			<div class="chat_meta">';
+			    item += '				<span class="chat_maxUser">' + userCountText + '</span>';
+			    item += '			</div>';
+			    item += '		</div>';
+			    item += '	</div>';
+			    item += '	<div class="chat_right">';
+			    item += '		<span class="enter_arrow">→</span>';
+			    item += '	</div>';
+			    item += '</div>';
+			
+			    return item;
+			}).join('');	// 배열안의 요소들을 하나의 긴 문자열로 싹 합쳐라
 			
 			chatting_list.innerHTML = tag;
 		}
+		
 		
 		
 		// 이미 열려있는 방 다시 눌렀을 때 중복 생성 방지(Set)
@@ -631,8 +857,67 @@
 			console.log(row.trim() !== "1" ? roomNo + '번방 이즈왓칭 실패' : roomNo + '번방 이즈왓칭 성공!');
 		}
 		
-		// 화면 로드시 채팅리스트 새로고침
-		document.addEventListener("DOMContentLoaded", reloadChatListHandler);
+		// 내가 참여중인 방 카운트
+		async function myRoomsCountHandler() {
+			const myRoomsCount = document.getElementById('myRoomsCount');
+			const url = cpath + '/homeAjax/myRoomsCount?userid=' + user
+			const count = await fetch(url).then(resp => resp.text());
+			
+			myRoomsCount.innerHTML = count;
+		}
+		
+		// 내가 참여중인 방
+		const btnMyRooms = document.getElementById('btnMyRooms');
+		if(btnMyRooms) {
+			btnMyRooms.addEventListener('click', async() => {
+				const url = cpath + '/homeAjax/selectMyRooms?userid=' + user;
+				const myRoomList = await fetch(url).then(resp => resp.json());
+				const tag = myRoomList.map(function(dto) {
+				    let item = '';
+				    
+				    let isGroup = dto.roomType === 'group';
+				    let typeBadge = isGroup ? '<span class="badge_type group">그룹</span>' : '<span class="badge_type direct">1:1</span>';
+				    let userCountText = isGroup ? dto.maxUserCount + '명 제한' : '개인 채팅';
+				
+				    item += '<div class="chatting_box" data-room-no="' + dto.roomNo + '" data-room-title="' + dto.roomTitle + '">';
+				    item += '	<div class="chat_left">';
+				    item += '		<span class="chat_no">#' + dto.roomNo + '</span>';
+				    item += '		<div class="chat_info">';
+				    item += '			<div class="chat_title_wrap">';
+				    item += 				typeBadge;
+				    item += '				<span class="chat_title">' + dto.roomTitle + '</span>';
+				    item += '			</div>';
+				    item += '			<div class="chat_meta">';
+				    item += '				<span class="chat_maxUser">' + userCountText + '</span>';
+				    item += '			</div>';
+				    item += '		</div>';
+				    item += '	</div>';
+				    item += '	<div class="chat_right">';
+				    item += '		<span class="enter_arrow">→</span>';
+				    item += '	</div>';
+				    item += '</div>';
+				
+				    return item;
+				}).join('');
+				
+				document.querySelector('.center_main_title').classList.add('hidden');
+				chatting_list.innerHTML = tag;
+			})
+		}
+		
+		
+		
+		
+		
+		// 로그인시 최초호출
+		if(user) {
+			userProfileImgHandler()	// 유저 프로필 생성
+			myRoomsCountHandler()	// 내가 참여중인 방 카운트
+		}
+		
+		
+		// 화면 로드시 전체 채팅방 클릭
+		allChatRoom.dispatchEvent(new Event('click'));
 		
 		
 		

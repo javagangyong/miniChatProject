@@ -23,6 +23,10 @@ public interface ChatDAO {
 
 	int updateWatching(ChatRoomJoinDTO joinDto);
 
+	int countMyRooms(String userid);
+
+	List<ChatRoomDTO> selectMyRooms(String userid);
+
 
 
 }
