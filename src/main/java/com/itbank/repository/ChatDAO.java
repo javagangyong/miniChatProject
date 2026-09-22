@@ -27,6 +27,10 @@ public interface ChatDAO {
 
 	List<ChatRoomDTO> selectMyRooms(String userid);
 
+	int updateAllLastReadMsgNo(ChatMessageDTO dto);
+
+	int updateLastReadMsgNo(ChatRoomJoinDTO dto);
+
 
 
 }

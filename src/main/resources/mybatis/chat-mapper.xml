@@ -38,9 +38,15 @@
 	</select>
 	
 	<insert id="insertChatMessage">
-		insert into chatMessage(roomNo, senderId, messageContent)
-			values(#{roomNo}, #{senderId}, #{messageContent})
+		insert into chatMessage(msgNo, roomNo, senderId, messageContent)
+			values(seqMsgNo.nextval, #{roomNo}, #{senderId}, #{messageContent})
 	</insert>
+	
+	<update id="updateAllLastReadMsgNo">
+		update chatRoomJoin 
+			set lastReadMsgNo = (select MAX(msgNo) from chatMessage where roomNo = #{roomNo})
+			where roomNo = #{roomNo} and isWatching = 'Y'
+	</update>
 	
 	<update id="updateWatching">
 		update chatRoomJoin set isWatching = #{isWatching}
@@ -57,5 +63,11 @@
 			where j.userid = #{userid}
 	</select>
 	
+	<update id="updateLastReadMsgNo">
+<!-- 	값없으면 0반환 = NVL -->
+		update chatRoomJoin 
+			set lastReadMsgNo = (select NVL(MAX(msgNo), 0) from chatMessage where roomNo = #{roomNo}) 
+			where roomNo = #{roomNo} and userid = #{userid}
+	</update>
 
 </mapper>

@@ -19,7 +19,7 @@ public class ChatService {
 		// 룸 타입 설정
 		dto.setRoomType(dto.getMaxUserCount() > 2 ? "group" : "direct");
 		
-		// 이때 Mapper의 설정에 의해 roomDto 객체 안에 roomNo가 세팅되어 돌아옴
+		// 이때 Mapper의 설정에 의해 dto 객체 안에 roomNo가 세팅되어 돌아옴
 		int result = dao.createChatroom(dto);
 		
 		// chatRoomJoin insert
@@ -45,7 +45,9 @@ public class ChatService {
 	}
 
 	public int insertChatMessage(ChatMessageDTO dto) {
-		return dao.insertChatMessage(dto);
+		int row = dao.insertChatMessage(dto);
+		int result = dao.updateAllLastReadMsgNo(dto);
+		return row + result;
 	}
 
 	public int insertRoomJoin(ChatRoomJoinDTO joinDto) {
@@ -64,6 +66,10 @@ public class ChatService {
 
 	public List<ChatRoomDTO> selectMyRooms(String userid) {
 		return dao.selectMyRooms(userid);
+	}
+
+	public int updateLastReadMsgNo(ChatRoomJoinDTO dto) {
+		return dao.updateLastReadMsgNo(dto);
 	}
 
 }

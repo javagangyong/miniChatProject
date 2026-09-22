@@ -59,6 +59,12 @@ public class HomeAjaxController {
 		return row;
 	}
 	
+	@PostMapping("/updateLastReadMsgNo")
+	public int updateLastReadMsgNo(@RequestBody ChatRoomJoinDTO dto) {
+		int row = cs.updateLastReadMsgNo(dto);
+		return row;
+	}
+	
 	@GetMapping("/myRoomsCount")
 	public int myRoomsCount(@RequestParam("userid") String userid) {
 		int row = cs.countMyRooms(userid);

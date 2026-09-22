@@ -28,7 +28,7 @@ public class StompController {
 	@SendTo("/broker/{roomNo}")
 	public ChatMessageDTO sendChatMessage(ChatMessageDTO dto) {
 		int row = cs.insertChatMessage(dto);
-		System.out.println(row != 1 ? "챗메세지 db저장 실패" : "");
+		System.out.println(row < 2 ? "챗메세지 or lastMsgNo 저장실패" : "");
 		return dto;
 	}
 
