@@ -724,6 +724,7 @@
 			
 			// 창 껐다 다시 켰을때를 위해
 			updateWatching(roomNo, user, 'Y');
+			updateLastReadMsgNo(roomNo, user);
 			// 해당 방 동시 구독하기
 			subscribeToRoom(roomNo);
 		})
@@ -784,7 +785,7 @@
 		}
 		
 		
-		// 채팅방 내리기
+		// 창 내리기
 		function minimizedChat(roomNo, roomTitle) {
 			const modalDiv = document.getElementById('chat_modal_' + roomNo);
 			if(modalDiv) modalDiv.classList.add('hidden');
@@ -805,7 +806,7 @@
 			updateWatching(roomNo, user, 'N');	// 이즈왓칭 갱신
 		}
 		
-		// 칩 누를시 채팅방 복원
+		// 창 올리기
 		function restoreChatModal(roomNo) {
 			const chip = document.getElementById('chat_chip_' + roomNo);
 			if(chip) chip.remove();
@@ -813,6 +814,7 @@
 			const modalDiv = document.getElementById('chat_modal_' + roomNo);
 			if(modalDiv) modalDiv.classList.remove('hidden');
 			updateWatching(roomNo, user, 'Y');	// 이즈왓칭 갱신
+			updateLastReadMsgNo(roomNo, user);	// 마지막 읽은 메세지 번호 갱신
 		}
 		
 		// 채팅방 끄기
@@ -855,6 +857,20 @@
 			}
 			const row = await fetch(url, opt).then(resp => resp.text());
 			console.log(row.trim() !== "1" ? roomNo + '번방 이즈왓칭 실패' : roomNo + '번방 이즈왓칭 성공!');
+		}
+		
+		// 마지막 읽은 메세지 번호 갱신
+		async function updateLastReadMsgNo(roomNo, user) {
+			const url = cpath + '/homeAjax/updateLastReadMsgNo';
+			const ob = {roomNo: roomNo, userid: user}
+			const opt = {
+					method: 'POST',
+					body: JSON.stringify(ob),
+					headers: {
+						'Content-Type': 'application/json;charset=utf-8'
+					}
+			}
+			await fetch(url, opt);
 		}
 		
 		// 내가 참여중인 방 카운트
