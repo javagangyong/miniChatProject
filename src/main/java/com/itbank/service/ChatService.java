@@ -72,4 +72,8 @@ public class ChatService {
 		return dao.updateLastReadMsgNo(dto);
 	}
 
+	public int updateUnReadCount(ChatRoomJoinDTO dto) {
+		return dao.updateUnReadCount(dto);
+	}
+
 }

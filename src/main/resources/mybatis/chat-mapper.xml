@@ -38,8 +38,9 @@
 	</select>
 	
 	<insert id="insertChatMessage">
-		insert into chatMessage(msgNo, roomNo, senderId, messageContent)
-			values(seqMsgNo.nextval, #{roomNo}, #{senderId}, #{messageContent})
+		insert into chatMessage(msgNo, roomNo, senderId, messageContent, unReadCount)
+			values(seqMsgNo.nextval, #{roomNo}, #{senderId}, #{messageContent}, 
+					(select count(*) from chatRoomJoin where roomNo = #{roomNo} and isWatching = 'N'))
 	</insert>
 	
 	<update id="updateAllLastReadMsgNo">
@@ -68,6 +69,24 @@
 		update chatRoomJoin 
 			set lastReadMsgNo = (select NVL(MAX(msgNo), 0) from chatMessage where roomNo = #{roomNo}) 
 			where roomNo = #{roomNo} and userid = #{userid}
+	</update>
+	
+	<update id="updateUnReadCount">
+		update chatMessage
+			set unReadCount = unReadCount -1	
+			where roomNo = #{roomNo}
+ 			and msgNo > (						
+				select NVL(lastReadMsgNo, 0) 
+					from chatRoomJoin 
+					where userid = #{userid} 
+					and roomNo = #{roomNo})
+			and msgNo &lt;= (
+				select NVL(MAX(msgNo), 0)
+					from chatMessage
+					where roomNo = #{roomNo})
+			and unReadCount > 0
+<!-- 		마지막 읽은 메세지 바로 다음부터 가장 최근 메세지까지의 메세지들을 -->
+<!-- 		unReadCount -1 시킨다 -->
 	</update>
 
 </mapper>
