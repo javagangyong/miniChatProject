@@ -620,8 +620,10 @@
 		
 		
 		
+		
 		// 이미 열려있는 방 다시 눌렀을 때 중복 생성 방지(Set)
 		const activeRooms = new Set();
+		
 		
 		// 채팅방 들어가기
 		chatting_list.addEventListener('click', async (e) => {
@@ -731,6 +733,7 @@
 		
 		
 		
+		
 		// 각 방별 구독 객체(구독 해제용)
 		const subscriptions = {};
 		
@@ -807,14 +810,16 @@
 		}
 		
 		// 창 올리기
-		function restoreChatModal(roomNo) {
+		async function restoreChatModal(roomNo) {
 			const chip = document.getElementById('chat_chip_' + roomNo);
 			if(chip) chip.remove();
 			
 			const modalDiv = document.getElementById('chat_modal_' + roomNo);
 			if(modalDiv) modalDiv.classList.remove('hidden');
-			updateWatching(roomNo, user, 'Y');	// 이즈왓칭 갱신
-			updateLastReadMsgNo(roomNo, user);	// 마지막 읽은 메세지 번호 갱신
+			await updateWatching(roomNo, user, 'Y');	// 1. 이즈왓칭 갱신
+			await unReadCount(roomNo, user);			// 2. 메세지 안읽은 사람 수 -1
+			await updateLastReadMsgNo(roomNo, user);	// 3. 마지막 읽은 메세지 번호 갱신
+														// 순서지켜야함 특히 2번 먼저 후 3번
 		}
 		
 		// 채팅방 끄기
@@ -868,6 +873,20 @@
 					body: JSON.stringify(ob),
 					headers: {
 						'Content-Type': 'application/json;charset=utf-8'
+					}
+			}
+			await fetch(url, opt);
+		}
+		
+		// 메세지 안읽은 사람 수 -1
+		async function unReadCount(roomNo, user) {
+			const url = cpath + '/homeAjax/unReadCount';
+			const ob = {roomNo: roomNo, userid: user};
+			const opt = {
+					method: 'POST',
+					body: JSON.stringify(ob),
+					headers: {
+						'Content-Type' : 'application/json;charset=utf-8'
 					}
 			}
 			await fetch(url, opt);

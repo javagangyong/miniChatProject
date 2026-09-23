@@ -65,6 +65,13 @@ public class HomeAjaxController {
 		return row;
 	}
 	
+	@PostMapping("/unReadCount")
+	public int unReadCount(@RequestBody ChatRoomJoinDTO dto) {
+		int row = cs.updateUnReadCount(dto);
+		System.out.println(row < 1 ? "unreadcount 수정안됨": "unreadcount수정 됨");
+		return row;
+	}
+	
 	@GetMapping("/myRoomsCount")
 	public int myRoomsCount(@RequestParam("userid") String userid) {
 		int row = cs.countMyRooms(userid);
