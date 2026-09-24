@@ -33,6 +33,8 @@ public interface ChatDAO {
 
 	int updateUnReadCount(ChatRoomJoinDTO dto);
 
+	int selectMsgNo(ChatMessageDTO dto);
+
 
 
 }
