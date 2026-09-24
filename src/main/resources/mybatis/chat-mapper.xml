@@ -38,9 +38,13 @@
 	</select>
 	
 	<insert id="insertChatMessage">
+		<!-- unreadCount dto에 저장	실시간 채팅에 나타내기 위함 -->
+		<selectKey keyProperty="unreadCount" resultType="int" order="BEFORE">
+			select count(*) from chatRoomJoin where roomNo = #{roomNo} and isWatching = 'N'
+		</selectKey>
+		
 		insert into chatMessage(msgNo, roomNo, senderId, messageContent, unReadCount)
-			values(seqMsgNo.nextval, #{roomNo}, #{senderId}, #{messageContent}, 
-					(select count(*) from chatRoomJoin where roomNo = #{roomNo} and isWatching = 'N'))
+			values(seqMsgNo.nextval, #{roomNo}, #{senderId}, #{messageContent}, #{unreadCount})
 	</insert>
 	
 	<update id="updateAllLastReadMsgNo">
@@ -88,5 +92,11 @@
 <!-- 		마지막 읽은 메세지 바로 다음부터 가장 최근 메세지까지의 메세지들을 -->
 <!-- 		unReadCount -1 시킨다 -->
 	</update>
+	
+	<select id="selectMsgNo">
+		select MAX(msgNo) from chatMessage 
+			where roomNo = #{roomNo} 
+			and senderId = #{senderId}
+	</select>
 
 </mapper>

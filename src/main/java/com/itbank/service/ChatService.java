@@ -46,6 +46,13 @@ public class ChatService {
 
 	public int insertChatMessage(ChatMessageDTO dto) {
 		int row = dao.insertChatMessage(dto);
+		
+		// 실시간 안읽은 사람 수 로직계산을 위한 메세지 번호 저장
+		int msgNo = dao.selectMsgNo(dto);
+		dto.setMsgNo(msgNo);
+		System.out.println("보낸 메세지 번호는 : " + msgNo);
+		
+		// isWatching = 'Y'인 사람들 모두 lastReadMsgNo 최신화
 		int result = dao.updateAllLastReadMsgNo(dto);
 		return row + result;
 	}
@@ -69,6 +76,7 @@ public class ChatService {
 	}
 
 	public int updateLastReadMsgNo(ChatRoomJoinDTO dto) {
+		// 채팅창 읽은 이 '한 사람'만 lastReadMsgNo 최신화
 		return dao.updateLastReadMsgNo(dto);
 	}
 

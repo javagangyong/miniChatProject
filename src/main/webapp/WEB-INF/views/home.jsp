@@ -326,7 +326,11 @@
 		z-index: 1;
 	}
 	
-	/* 화면 중앙 채팅 모달 스타일 */
+	
+	
+	
+	
+	/* 화면 오른쪽아래 채팅 모달 스타일 */
 	.chat_modal_multi {
 		position: fixed;
 		bottom: 20px;
@@ -379,9 +383,28 @@
  		max-width: 70%;		/* 말풍선이 길어지면 자동으로 줄바꿈 */
 	}
 	
+/* 	말풍선 + 안읽은 사람 수 숫자를 가로배치 */
+	div.bubble_container {
+		display: flex;
+ 		align-items: flex-end;	/* 숫자, 말풍선이 바닥쪽에 붙도록 */
+		gap: 6px;
+	}
+	/* 안 읽은 사람 수 */
+	.unread_flag {
+		font-size: 11px;
+		font-weight: bold;
+		color: #F57C00;
+		user-select: none;		/* 드래그 방지 */
+	}
+	
 	/* 상대방 메세지 (왼쪽 흰색) */
 	div.other_chat {
 		align-self: flex-start;		/* align-items는 부모 align-self는 자식이 개인 적용 */	
+	}
+	div.other_chat .sender {
+		font-size: 12px;
+		color: #666;
+		margin-bottom: 2px;
 	}
 	div.other_chat .bubble {
 		background-color: #ffffff;
@@ -668,14 +691,24 @@
 			// 내가 입력, 상대방이 입력을 다르게 적용
 			const tag = chatMessage.map(function(dto) {
 				let item = '';
+				
+				// 안 읽은 사람 수 태그(0보다 클때만 표시)
+				const unreadHtml = dto.unreadCount > 0 ? '<span class="unread_flag">' + dto.unreadCount + '</span>' : '';
+				
 				if(dto.senderId !== user) {	// 상대방 메세지
 					item += '<div class="chat_message other_chat">';
 					item += '	<div class="sender">' + dto.senderId + '</div>';
-					item += '	<div class="bubble">' + dto.messageContent + '</div>';
+					item += '	<div class="bubble_container" data-msg-no="'+ dto.msgNo +'">';
+					item += '		<div class="bubble">' + dto.messageContent + '</div>';
+					item += '		' + unreadHtml;	// 상대방 메세지는 말풍선 오른쪽
+					item += '	</div>'
 					item += '</div>';
 				} else {	// 내 메세지
 					item += '<div class="chat_message my_chat">'
-					item += '	<div class="bubble">' + dto.messageContent + '</div>';
+					item += '	<div class="bubble_container" data-msg-no="'+ dto.msgNo +'">';
+					item += '		' + unreadHtml;	// 내 메세지는 말풍선 왼쪽
+					item += '		<div class="bubble">' + dto.messageContent + '</div>';
+					item += '	</div>'
 					item += '</div>';
 				}
 				return item;
@@ -749,14 +782,24 @@
 					const targetChatBody = document.getElementById('chat_body_' + roomNo);
 					if(targetChatBody) {	// if이유는 모달창 껐을때 들어오는 메세지로 인한 오류 방지
 						let item = '';
+					
+						// 안 읽은 사람 수 태그(0보다 클때만 표시)
+						const unreadHtml = dto.unreadCount > 0 ? '<span class="unread_flag">' + dto.unreadCount + '</span>' : '';
+						
 						if(dto.senderId !== user) {	// 상대방 메세지
 							item += '<div class="chat_message other_chat">';
 							item += '	<div class="sender">' + dto.senderId + '</div>';
-							item += '	<div class="bubble">' + dto.messageContent + '</div>';
+							item += '	<div class="bubble_container" data-msg-no="'+ dto.msgNo +'">';
+							item += '		<div class="bubble">' + dto.messageContent + '</div>';
+							item += '		' + unreadHtml;	// 상대방 메세지는 말풍선 오른쪽
+							item += '	</div>'
 							item += '</div>';
 						} else {	// 내 메세지
 							item += '<div class="chat_message my_chat">'
-							item += '	<div class="bubble">' + dto.messageContent + '</div>';
+							item += '	<div class="bubble_container" data-msg-no="'+ dto.msgNo +'">';
+							item += '		' + unreadHtml;	// 내 메세지는 말풍선 왼쪽
+							item += '		<div class="bubble">' + dto.messageContent + '</div>';
+							item += '	</div>'
 							item += '</div>';
 						}
 						// insertAdjacentHTML 'beforeend'는 밑에 추가로 하나씩 붙이는거
@@ -820,6 +863,10 @@
 			await unReadCount(roomNo, user);			// 2. 메세지 안읽은 사람 수 -1
 			await updateLastReadMsgNo(roomNo, user);	// 3. 마지막 읽은 메세지 번호 갱신
 														// 순서지켜야함 특히 2번 먼저 후 3번
+			
+														
+														
+			
 		}
 		
 		// 채팅방 끄기
