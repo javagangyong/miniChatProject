@@ -644,6 +644,11 @@
 		
 		
 		
+		
+		
+		
+		
+		
 		// 이미 열려있는 방 다시 눌렀을 때 중복 생성 방지(Set)
 		const activeRooms = new Set();
 		
@@ -759,9 +764,27 @@
 			
 			// 창 껐다 다시 켰을때를 위해
 			updateWatching(roomNo, user, 'Y');
-			updateLastReadMsgNo(roomNo, user);
 			// 해당 방 동시 구독하기
 			subscribeToRoom(roomNo);
+			
+			const fromMsgNo = await fromMsgNoHandler(roomNo, user);
+			const toMsgNo = await toMsgNoHandler(roomNo, user);
+			console.log('시작번호, 끝번호 '+ fromMsgNo + toMsgNo)
+			
+			// 읽을 새로운 메세지가 있을때만
+			if(toMsgNo > fromMsgNo) {
+				// 구독 후 처리가 완료될 시간 확보
+				setTimeout(() => {
+					// 메세지 안읽은 사람 수 -1 db저장 + lastReadMsgNo 갱신도 백엔드에서 같이
+					stompClient.send('/app/read/' + roomNo, {}, JSON.stringify({
+						type: 'read',
+						roomNo: roomNo,
+						senderId: user,
+						fromMsgNo: fromMsgNo,
+						toMsgNo: toMsgNo
+					}))
+				}, 50)
+			}
 		})
 		
 		
@@ -779,32 +802,66 @@
 				subscriptions[roomNo] = stompClient.subscribe('/broker/' + roomNo, (response) => {
 					const dto = JSON.parse(response.body);
 					
-					const targetChatBody = document.getElementById('chat_body_' + roomNo);
-					if(targetChatBody) {	// if이유는 모달창 껐을때 들어오는 메세지로 인한 오류 방지
-						let item = '';
-					
-						// 안 읽은 사람 수 태그(0보다 클때만 표시)
-						const unreadHtml = dto.unreadCount > 0 ? '<span class="unread_flag">' + dto.unreadCount + '</span>' : '';
+					// 채팅 보내기
+					if(!dto.type || dto.type === 'send') {
+						const targetChatBody = document.getElementById('chat_body_' + roomNo);
+						if(targetChatBody) {	// if이유는 모달창 껐을때 들어오는 메세지로 인한 오류 방지
+							let item = '';
 						
-						if(dto.senderId !== user) {	// 상대방 메세지
-							item += '<div class="chat_message other_chat">';
-							item += '	<div class="sender">' + dto.senderId + '</div>';
-							item += '	<div class="bubble_container" data-msg-no="'+ dto.msgNo +'">';
-							item += '		<div class="bubble">' + dto.messageContent + '</div>';
-							item += '		' + unreadHtml;	// 상대방 메세지는 말풍선 오른쪽
-							item += '	</div>'
-							item += '</div>';
-						} else {	// 내 메세지
-							item += '<div class="chat_message my_chat">'
-							item += '	<div class="bubble_container" data-msg-no="'+ dto.msgNo +'">';
-							item += '		' + unreadHtml;	// 내 메세지는 말풍선 왼쪽
-							item += '		<div class="bubble">' + dto.messageContent + '</div>';
-							item += '	</div>'
-							item += '</div>';
+							// 안 읽은 사람 수 태그(0보다 클때만 표시)
+							const unreadHtml = dto.unreadCount > 0 ? '<span class="unread_flag">' + dto.unreadCount + '</span>' : '';
+							
+							if(dto.senderId !== user) {	// 상대방 메세지
+								item += '<div class="chat_message other_chat">';
+								item += '	<div class="sender">' + dto.senderId + '</div>';
+								item += '	<div class="bubble_container" data-msg-no="'+ dto.msgNo +'">';
+								item += '		<div class="bubble">' + dto.messageContent + '</div>';
+								item += '		' + unreadHtml;	// 상대방 메세지는 말풍선 오른쪽
+								item += '	</div>'
+								item += '</div>';
+							} else {	// 내 메세지
+								item += '<div class="chat_message my_chat">'
+								item += '	<div class="bubble_container" data-msg-no="'+ dto.msgNo +'">';
+								item += '		' + unreadHtml;	// 내 메세지는 말풍선 왼쪽
+								item += '		<div class="bubble">' + dto.messageContent + '</div>';
+								item += '	</div>'
+								item += '</div>';
+							}
+							// insertAdjacentHTML 'beforeend'는 밑에 추가로 하나씩 붙이는거
+							targetChatBody.insertAdjacentHTML('beforeend', item);
+							targetChatBody.scrollTop = targetChatBody.scrollHeight;
 						}
-						// insertAdjacentHTML 'beforeend'는 밑에 추가로 하나씩 붙이는거
-						targetChatBody.insertAdjacentHTML('beforeend', item);
-						targetChatBody.scrollTop = targetChatBody.scrollHeight;
+					}
+					// 채팅 읽기
+					else if(dto.type === 'read') {
+						const targetChatBody = document.getElementById('chat_body_' + roomNo);
+						
+						if(targetChatBody) {
+							// chat_body 안에서의 모든 메세지 가져오기
+							const bubbleContainers = targetChatBody.querySelectorAll('.bubble_container[data-msg-no]');
+							
+							bubbleContainers.forEach(el => {
+								const msgNo = parseInt(el.getAttribute('data-msg-no'), 10)
+								
+								// fromMsgNo 초과 ~ toMsgNo 이하
+								if(dto.toMsgNo >= msgNo && msgNo > dto.fromMsgNo) {
+									const unread_flag = el.querySelector('.unread_flag');
+									if(unread_flag) {
+										// 안읽은 수 저장
+										let count = parseInt(unread_flag.textContent, 10);
+										// 숫자이면서(안정성) 0 초과시
+										if(!isNaN(count) && count > 0) {
+											count -= 1;
+											if(count === 0) {
+												unread_flag.remove();
+											} else {
+												unread_flag.textContent = count;
+											}
+										}
+									}
+								}
+							})
+						}
 					}
 				});
 				console.log(roomNo + '번 방 실시간 구독 등록 완료');
@@ -822,7 +879,9 @@
 			stompClient.send('/app/sendChatMessage/' + roomNo, {}, JSON.stringify({
 				roomNo: roomNo,
 				messageContent: messageContent,
-				senderId: user
+				senderId: user,
+				type: 'send'
+				
 			}))
 			
 			// 입력 후 빈칸 처리 및 포커스 유지
@@ -852,6 +911,9 @@
 			updateWatching(roomNo, user, 'N');	// 이즈왓칭 갱신
 		}
 		
+		
+		
+		
 		// 창 올리기
 		async function restoreChatModal(roomNo) {
 			const chip = document.getElementById('chat_chip_' + roomNo);
@@ -860,13 +922,24 @@
 			const modalDiv = document.getElementById('chat_modal_' + roomNo);
 			if(modalDiv) modalDiv.classList.remove('hidden');
 			await updateWatching(roomNo, user, 'Y');	// 1. 이즈왓칭 갱신
-			await unReadCount(roomNo, user);			// 2. 메세지 안읽은 사람 수 -1
-			await updateLastReadMsgNo(roomNo, user);	// 3. 마지막 읽은 메세지 번호 갱신
-														// 순서지켜야함 특히 2번 먼저 후 3번
+
 			
-														
-														
+			const fromMsgNo = await fromMsgNoHandler(roomNo, user);
+			const toMsgNo = await toMsgNoHandler(roomNo, user);
+			console.log('시작번호, 끝번호 '+ fromMsgNo + toMsgNo)
 			
+			// 읽을 새로운 메세지가 있을때만
+			if(toMsgNo > fromMsgNo) {
+				// 메세지 안읽은 사람 수 -1 db저장 + lastReadMsgNo 갱신도 백엔드에서 같이
+				stompClient.send('/app/read/' + roomNo, {}, JSON.stringify({
+					type: 'read',
+					roomNo: roomNo,
+					senderId: user,
+					fromMsgNo: fromMsgNo,
+					toMsgNo: toMsgNo
+				}))
+			}
+														
 		}
 		
 		// 채팅방 끄기
@@ -925,20 +998,6 @@
 			await fetch(url, opt);
 		}
 		
-		// 메세지 안읽은 사람 수 -1
-		async function unReadCount(roomNo, user) {
-			const url = cpath + '/homeAjax/unReadCount';
-			const ob = {roomNo: roomNo, userid: user};
-			const opt = {
-					method: 'POST',
-					body: JSON.stringify(ob),
-					headers: {
-						'Content-Type' : 'application/json;charset=utf-8'
-					}
-			}
-			await fetch(url, opt);
-		}
-		
 		// 내가 참여중인 방 카운트
 		async function myRoomsCountHandler() {
 			const myRoomsCount = document.getElementById('myRoomsCount');
@@ -985,6 +1044,28 @@
 				document.querySelector('.center_main_title').classList.add('hidden');
 				chatting_list.innerHTML = tag;
 			})
+		}
+		
+		// lastReadMsgNo
+		async function fromMsgNoHandler(roomNo, user) {
+			const lastReadMsgNoUrl = cpath + '/homeAjax/selectLastReadMsgNo';
+			const ob = {roomNo: roomNo, userid: user};
+			const opt = {
+					method: 'POST',
+					body: JSON.stringify(ob),
+					headers: {
+						'Content-Type': 'application/json;charset=utf-8'
+					}
+			}
+			const fromMsgNo = await fetch(lastReadMsgNoUrl, opt).then(resp => resp.text());
+			return fromMsgNo;
+		}
+		
+		// toMsgNo
+		async function toMsgNoHandler(roomNo) {
+			const toMsgNoUrl = cpath + '/homeAjax/selectMaxMsgNo/' + roomNo;
+			const toMsgNo = await fetch(toMsgNoUrl).then(resp => resp.text());
+			return toMsgNo;
 		}
 		
 		

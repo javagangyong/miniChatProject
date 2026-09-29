@@ -29,6 +29,15 @@ public class StompController {
 		System.out.println(row < 2 ? "챗메세지 or lastMsgNo 저장실패" : "");
 		return dto;
 	}
+	
+	@MessageMapping("/read/{roomNo}")
+	@SendTo("/broker/{roomNo}")
+	public ChatMessageDTO read(ChatMessageDTO dto) {
+		// ui 실시간 변경 + unReadCount -1 db저장 + lastReadMsgNo 갱신
+		int row = cs.updateUnReadCount(dto);
+		System.out.println(row > 0 ? "" : "unReadCount - 1 db 저장 실패");
+		return dto;
+	}
 
 	@MessageMapping("/ping")
 	public void ping() {

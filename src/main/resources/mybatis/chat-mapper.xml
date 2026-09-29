@@ -69,25 +69,17 @@
 	</select>
 	
 	<update id="updateLastReadMsgNo">
-<!-- 	값없으면 0반환 = NVL -->
 		update chatRoomJoin 
-			set lastReadMsgNo = (select NVL(MAX(msgNo), 0) from chatMessage where roomNo = #{roomNo}) 
-			where roomNo = #{roomNo} and userid = #{userid}
+			set lastReadMsgNo = #{toMsgNo} 
+			where roomNo = #{roomNo} and userid = #{senderId}
 	</update>
 	
 	<update id="updateUnReadCount">
 		update chatMessage
 			set unReadCount = unReadCount -1	
 			where roomNo = #{roomNo}
- 			and msgNo > (						
-				select NVL(lastReadMsgNo, 0) 
-					from chatRoomJoin 
-					where userid = #{userid} 
-					and roomNo = #{roomNo})
-			and msgNo &lt;= (
-				select NVL(MAX(msgNo), 0)
-					from chatMessage
-					where roomNo = #{roomNo})
+ 			and msgNo > #{fromMsgNo}
+			and msgNo &lt;= #{toMsgNo}
 			and unReadCount > 0
 <!-- 		마지막 읽은 메세지 바로 다음부터 가장 최근 메세지까지의 메세지들을 -->
 <!-- 		unReadCount -1 시킨다 -->
@@ -97,6 +89,18 @@
 		select MAX(msgNo) from chatMessage 
 			where roomNo = #{roomNo} 
 			and senderId = #{senderId}
+	</select>
+	
+	<select id="selectLastReadMsgNo">
+<!-- 	값없으면 0반환 = NVL -->
+		select NVL(lastReadMsgNo, 0) from chatRoomJoin 
+		where roomNo = #{roomNo}
+		and userid = #{userid}
+	</select>
+	
+	<select id="selectMaxMsgNo">
+		select NVL(MAX(msgNo), 0) from chatMessage
+		where roomNo = #{roomNo}
 	</select>
 
 </mapper>

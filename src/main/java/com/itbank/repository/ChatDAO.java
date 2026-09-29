@@ -29,11 +29,18 @@ public interface ChatDAO {
 
 	int updateAllLastReadMsgNo(ChatMessageDTO dto);
 
-	int updateLastReadMsgNo(ChatRoomJoinDTO dto);
+	int updateLastReadMsgNo(ChatMessageDTO dto);
 
-	int updateUnReadCount(ChatRoomJoinDTO dto);
+	int updateUnReadCount(ChatMessageDTO dto);
 
+	// '내가 보낸' 메세지 번호를 스크립트에 저장하기 위해
 	int selectMsgNo(ChatMessageDTO dto);
+
+	int selectLastReadMsgNo(ChatRoomJoinDTO dto);
+
+	// 방에서 가장 최신 메세지 번호
+	int selectMaxMsgNo(int roomNo);
+
 
 
 
