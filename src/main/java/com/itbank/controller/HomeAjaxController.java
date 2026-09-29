@@ -6,6 +6,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,18 +60,18 @@ public class HomeAjaxController {
 		return row;
 	}
 	
-	@PostMapping("/updateLastReadMsgNo")
-	public int updateLastReadMsgNo(@RequestBody ChatRoomJoinDTO dto) {
-		int row = cs.updateLastReadMsgNo(dto);
-		return row;
-	}
+//	@PostMapping("/updateLastReadMsgNo")
+//	public int updateLastReadMsgNo(@RequestBody ChatRoomJoinDTO dto) {
+//		int row = cs.updateLastReadMsgNo(dto);
+//		return row;
+//	}
 	
-	@PostMapping("/unReadCount")
-	public int unReadCount(@RequestBody ChatRoomJoinDTO dto) {
-		int row = cs.updateUnReadCount(dto);
-		System.out.println(row < 1 ? "unreadcount 수정안됨": "unreadcount수정 됨");
-		return row;
-	}
+//	@PostMapping("/unReadCount")
+//	public int unReadCount(@RequestBody ChatRoomJoinDTO dto) {
+//		int row = cs.updateUnReadCount(dto);
+//		System.out.println(row < 1 ? "unreadcount 수정안됨": "unreadcount수정 됨");
+//		return row;
+//	}
 	
 	@GetMapping("/myRoomsCount")
 	public int myRoomsCount(@RequestParam("userid") String userid) {
@@ -82,6 +83,18 @@ public class HomeAjaxController {
 	public List<ChatRoomDTO> myRoomList(@RequestParam("userid") String userid) {
 		List<ChatRoomDTO> list = cs.selectMyRooms(userid);
 		return list;
+	}
+	
+	@PostMapping("/selectLastReadMsgNo")
+	public int selectLastReadMsgNo(@RequestBody ChatRoomJoinDTO dto) {
+		int lastReadMsgNo = cs.selectLastReadMsgNo(dto);
+		return lastReadMsgNo;
+	}
+	
+	@GetMapping("/selectMaxMsgNo/{roomNo}")
+	public int selectMaxMsgNo(@PathVariable("roomNo") int roomNo) {
+		int maxMsgNo = cs.selectMaxMsgNo(roomNo);
+		return maxMsgNo;
 	}
 
 

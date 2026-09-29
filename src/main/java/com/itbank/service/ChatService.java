@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.itbank.model.ChatMessageDTO;
 import com.itbank.model.ChatRoomDTO;
@@ -75,13 +76,22 @@ public class ChatService {
 		return dao.selectMyRooms(userid);
 	}
 
-	public int updateLastReadMsgNo(ChatRoomJoinDTO dto) {
-		// 채팅창 읽은 이 '한 사람'만 lastReadMsgNo 최신화
-		return dao.updateLastReadMsgNo(dto);
+	@Transactional
+	public int updateUnReadCount(ChatMessageDTO dto) {
+		int row = dao.updateUnReadCount(dto);
+		// 채팅창 읽은 이 '한 사람'만 lastReadMsgNo 최신화		
+		int row2 = dao.updateLastReadMsgNo(dto);
+		return row;
 	}
 
-	public int updateUnReadCount(ChatRoomJoinDTO dto) {
-		return dao.updateUnReadCount(dto);
+	public int selectLastReadMsgNo(ChatRoomJoinDTO dto) {
+		return dao.selectLastReadMsgNo(dto);
 	}
+
+	public int selectMaxMsgNo(int roomNo) {
+		return dao.selectMaxMsgNo(roomNo);
+	}
+
+	
 
 }

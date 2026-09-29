@@ -18,6 +18,30 @@ public class ChatMessageDTO {
 	private int unreadCount;
 	private Date sendTime;
 	
+	private String type;
+	private int fromMsgNo;
+	private int toMsgNo;
+	
+	
+	
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
+	public int getFromMsgNo() {
+		return fromMsgNo;
+	}
+	public void setFromMsgNo(int fromMsgNo) {
+		this.fromMsgNo = fromMsgNo;
+	}
+	public int getToMsgNo() {
+		return toMsgNo;
+	}
+	public void setToMsgNo(int toMsgNo) {
+		this.toMsgNo = toMsgNo;
+	}
 	public int getMsgNo() {
 		return msgNo;
 	}
