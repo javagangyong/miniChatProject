@@ -132,7 +132,7 @@ DB에 읽음 상태를 저장한 뒤에도, 이미 열려 있는 다른 참여�
 | 서버 | Java 11, Spring Framework 5.3.30 | 채팅방·메시지 요청 처리, 읽음 상태 갱신 |
 | 데이터 저장 | Oracle, MyBatis | 대화 내역과 방 참여 정보 조회·저장 |
 | 실시간 통신 | WebSocket, STOMP, SockJS | 방별 메시지 전송과 읽음 변경 알림 |
-| 화면 | JSP, HTML/CSS, JavaScript, jQuery, Ajax | 여러 채팅창 구성, 목록 조회, 수신 내용 표시 |
+| 화면 | JSP, HTML/CSS, JavaScript, Ajax | 여러 채팅창 구성, 목록 조회, 수신 내용 표시 |
 | 개발 도구 | STS, Maven, Git | 개발 환경, 의존성·빌드 및 변경 이력 관리 |
 
 화면에서는 채팅방 목록과 대화 내역 등을 HTTP 요청으로 불러오고, 실시간 메시지와 읽음 변경은 WebSocket/STOMP로 주고받습니다.
